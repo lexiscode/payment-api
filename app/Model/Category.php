@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entities;
+namespace App\Model;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;

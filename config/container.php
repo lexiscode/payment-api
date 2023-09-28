@@ -81,26 +81,6 @@ $container->set(EntityManager::class, function (Container $c): EntityManager {
     return EntityManager::create($settings['doctrine']['connection'], $config);
 });
 
-$container->set(\PDO::class, function ($c){
-    $dbHost = $_ENV['MARIADB_HOST'];
-    $dbName = $_ENV['MARIADB_DB_NAME'];
-    $dbUser = $_ENV['MARIADB_DB_USER'];
-    $dbPassword = $_ENV['MARIADB_DB_USER_PASSWORD'];
-    $dsn = "mysql:host=$dbHost;dbname=$dbName";
-    $options = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ];
-    try {
-        $pdo = new PDO($dsn, $dbUser, $dbPassword, $options);
-    } catch (PDOException $exception){
-        error_log($exception->getMessage());
-    }
-
-    return $pdo;
-});
-
 
 // Monologging
 $container->set(Logger::class, function (Container $container) {
@@ -118,7 +98,7 @@ $container->set(Logger::class, function (Container $container) {
 });
 
 
-// Creating a container for CategoryRepository
+// Creating a container instance for CategoryRepository
 $container->set(CategoryRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new CategoryRepositoryDoctrine($em);

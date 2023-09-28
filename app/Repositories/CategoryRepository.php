@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Entities\Category;
+use App\Model\Category;
 
 interface CategoryRepository
 {

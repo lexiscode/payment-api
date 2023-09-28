@@ -30,7 +30,7 @@ class ReferenceController
                 return new JsonResponse($responseData, 400);
             }
 
-            $query = $this->em->createQuery('SELECT c FROM App\Entities\Category c WHERE c.name LIKE :name');
+            $query = $this->em->createQuery('SELECT c FROM App\Model\Category c WHERE c.name LIKE :name');
             $query->setParameter('name', '%' . $name . '%');
             $categories = $query->getResult();
 
@@ -77,7 +77,7 @@ class ReferenceController
 
             $qb = $this->em->createQueryBuilder();
             $qb->select('c.id', 'c.name', 'c.description')
-                ->from('App\Entities\Category', 'c')
+                ->from('App\Model\Category', 'c')
                 ->where('c.id = :id')
                 ->setParameter('id', $id);
 

@@ -7,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Repositories\CategoryRepository;
 use Laminas\Diactoros\Response\JsonResponse;
 
-use App\Entities\Category;
+use App\Model\Category;
 
 class CategoryController
 {
