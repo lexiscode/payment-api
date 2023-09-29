@@ -10,18 +10,20 @@ use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Request;
 use Throwable;
 use Exception;
+use GuzzleHttp\Psr7\ServerRequest;
 
-final class CustomErrorHandler
+class CustomErrorHandler
 {
     private Logger $logger;
 
     public function __construct(private App $app)
     {
+        // injecting the Logger interface
         $this->logger = $this->app->getContainer()->get(Logger::class);
     }
 
     public function __invoke(
-        Request          $request,
+        ServerRequest    $request, // Change the type hint here
         Throwable        $exception,
         bool             $displayErrorDetails,
         bool             $logErrors,
@@ -29,13 +31,16 @@ final class CustomErrorHandler
         ?LoggerInterface $logger = null
     )
     {
+
+        $statusCode = 500; // Default status code
+        
         $logger?->error($exception->getMessage());
 
         if ($exception instanceof ORMException || $exception instanceof \PDOException) {
             $this->logger->critical($exception->getMessage());
             $statusCode = 500;
         } else if($exception instanceof HttpNotFoundException){
-            $this->logger->alert($exception->getMessage());
+            $this->logger->critical($exception->getMessage());
             $statusCode = 404;
         }else if($exception instanceof Exception) {
             $this->logger->alert($exception->getMessage());
@@ -45,12 +50,6 @@ final class CustomErrorHandler
         $payload = [
             'message' => $exception->getMessage()
         ];
-
-
-
-
-
-
 
         if ($displayErrorDetails) {
             $payload['details'] = $exception->getMessage();
@@ -63,8 +62,6 @@ final class CustomErrorHandler
         );
 
         return $response->withStatus($statusCode);
-
-
     }
 }
 

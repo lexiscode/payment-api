@@ -83,17 +83,20 @@ $container->set(EntityManager::class, function (Container $c): EntityManager {
 
 
 // Monologging
-$container->set(Logger::class, function (Container $container) {
-    // Monolog Example
-    $logger = new Logger('logger');
+$container->set(Logger::class, function (Container $container){
+    $logger = new Logger('slim-docker-api');
+
     $output = "%level_name% | %datetime% > %message% | %context% %extra%\n";
     $dateFormat = "Y-m-d, H:i:s";
-    $logger->pushHandler((new StreamHandler(__DIR__ . '/../logs/error.log', Level::Error))
+    $logger->pushHandler((new StreamHandler(__DIR__ . '/../logs/alert.log', Level::Alert))
         ->setFormatter(new LineFormatter($output, $dateFormat)));
-    $logger->pushHandler((new StreamHandler(__DIR__ . '/../logs/info.log', Level::Info))
+    $logger->pushHandler((new StreamHandler(__DIR__ . '/../logs/critical.log', Level::Critical))
         ->setFormatter(new JsonFormatter()));
-    $logger->pushHandler((new StreamHandler(__DIR__ . '/../logs/debug.log', Level::Debug))
-        ->setFormatter(new LineFormatter($output, $dateFormat)));
+    $logger->pushHandler(new StreamHandler(__DIR__ . '/../logs/error.log', Level::Error));
+    $logger->pushHandler(new StreamHandler(__DIR__ . '/../logs/warning.log', Level::Warning));
+    $logger->pushHandler(new StreamHandler(__DIR__ . '/../logs/notice.log', Level::Notice));
+    $logger->pushHandler(new StreamHandler(__DIR__ . '/../logs/info.log', Level::Info));
+    $logger->pushHandler(new StreamHandler(__DIR__ . '/../logs/debug.log', Level::Debug));
     return $logger;
 });
 
@@ -108,7 +111,8 @@ $container->set(CategoryRepository::class, function (Container $container){
 // Define the CategoryController and inject dependencies
 $container->set(App\Controllers\CategoryController::class, function (Container $c) {
     return new App\Controllers\CategoryController(
-        $c->get(App\Repositories\CategoryRepository::class)
+        $c->get(App\Repositories\CategoryRepository::class),
+        $c->get(Logger::class) // Inject the Logger here
     );
 });
 

@@ -6,44 +6,89 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Repositories\CategoryRepository;
 use Laminas\Diactoros\Response\JsonResponse;
-
+use Slim\Exception\HttpNotFoundException;
 use App\Model\Category;
+
+use Monolog\Logger;
+use Slim\App;
 
 class CategoryController
 {
     private $categoryRepository;
+    private $logger;
 
-    public function __construct(CategoryRepository $categoryRepository)
+    public function __construct(CategoryRepository $categoryRepository, Logger $logger)
     {
         $this->categoryRepository = $categoryRepository;
+        $this->logger = $logger;
     }
+    
 
     public function getAllCategories(Request $request, Response $response): Response
     {
-        $categories = $this->categoryRepository->findAll();
+        try{
 
-        $categoryData = [];
-        foreach ($categories as $category) {
-            $categoryData[] = $category->toArray();
+            $categories = $this->categoryRepository->findAll();
+
+            $categoryData = [];
+            foreach ($categories as $category) {
+                $categoryData[] = $category->toArray();
+            }
+
+            $response->getBody()->write(json_encode($categoryData));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (\Exception $e) {
+            // Handle exceptions and errors here
+            throw new \Exception('Internal Server Error', 500);
+            error_log($e->getMessage());
+
+            $responseData = [
+                "success" => false,
+                "error" => "Internal Server Error",
+                "message" => "An error occurred while creating the category",
+                "status" => 500,
+                "path" => "/v1/category"
+            ];
+
+            return new JsonResponse($responseData, 500);
         }
-
-        $response->getBody()->write(json_encode($categoryData));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        
     }
 
     public function getCategoryById(Request $request, Response $response, array $args): Response
     {
-        $id = htmlspecialchars($args['id']);
-        $category = $this->categoryRepository->findById($id);
+        try{
 
-        if ($category === null) {
-            return new JsonResponse(['message' => 'Category not found'], 404);
+            $id = htmlspecialchars($args['id']);
+            $category = $this->categoryRepository->findById($id);
+
+            if ($category === null) {
+                //throw new HttpNotFoundException('Category not found', 404);
+                $this->logger->info("Status 404: Category not found with this id:$id");
+                return new JsonResponse(['message' => 'Category not found'], 404);
+            }
+
+            $categoryData = $category->toArray();
+
+            $response->getBody()->write(json_encode($categoryData));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+            
+        } catch (\Exception $e) {
+            // Handle exceptions and errors here
+            throw new \Exception('Internal Server Error', 500);
+            error_log($e->getMessage());
+
+            $responseData = [
+                "success" => false,
+                "error" => "Internal Server Error",
+                "message" => "An error occurred while creating the category",
+                "status" => 500,
+                "path" => "/v1/category"
+            ];
+
+            return new JsonResponse($responseData, 500);
         }
-
-        $categoryData = $category->toArray();
-
-        $response->getBody()->write(json_encode($categoryData));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     public function createCategory(Request $request, Response $response): Response
@@ -59,6 +104,8 @@ class CategoryController
                     "status" => 400,
                     "path" => "/v1/category"
                 ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).');
                 return new JsonResponse($responseData, 400);
             }
 
@@ -79,6 +126,7 @@ class CategoryController
             return new JsonResponse($responseData, 200);
         } catch (\Exception $e) {
             // Handle exceptions and errors here
+            throw new \Exception('Internal Server Error', 500);
             error_log($e->getMessage());
 
             $responseData = [
@@ -139,6 +187,7 @@ class CategoryController
             }
         } catch (\Exception $e) {
             // Handle exceptions and errors here
+            throw new \Exception('Internal Server Error', 500);
             error_log($e->getMessage());
 
             $responseData = [
@@ -204,6 +253,7 @@ class CategoryController
             }
         } catch (\Exception $e) {
             // Handle exceptions and errors here
+            throw new \Exception('Internal Server Error', 500);
             error_log($e->getMessage());
 
             $responseData = [
@@ -258,6 +308,7 @@ class CategoryController
             }
         } catch (\Exception $e) {
             // Handle exceptions and errors here
+            throw new \Exception('Internal Server Error', 500);
             error_log($e->getMessage());
 
             $responseData = [
