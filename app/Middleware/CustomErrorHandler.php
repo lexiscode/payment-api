@@ -9,6 +9,7 @@ use Slim\App;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Request;
 use Throwable;
+use Exception;
 
 final class CustomErrorHandler
 {
@@ -30,18 +31,26 @@ final class CustomErrorHandler
     {
         $logger?->error($exception->getMessage());
 
-        if ($exception instanceof ORMException) {
-            $payload = [];
+        if ($exception instanceof ORMException || $exception instanceof \PDOException) {
+            $this->logger->critical($exception->getMessage());
             $statusCode = 500;
-        } else if ($exception instanceof HttpNotFoundException) {
-            $payload = [];
-            $this->logger->info($exception->getMessage());
+        } else if($exception instanceof HttpNotFoundException){
+            $this->logger->alert($exception->getMessage());
             $statusCode = 404;
-        } else if ($exception instanceof \PDOException) {
-            $payload = [];
-            $this->logger->debug($exception->getMessage());
-            $statusCode = 400;
+        }else if($exception instanceof Exception) {
+            $this->logger->alert($exception->getMessage());
+            $statusCode = $exception->getCode();
         }
+
+        $payload = [
+            'message' => $exception->getMessage()
+        ];
+
+
+
+
+
+
 
         if ($displayErrorDetails) {
             $payload['details'] = $exception->getMessage();
