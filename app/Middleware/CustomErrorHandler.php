@@ -11,6 +11,7 @@ use Slim\Psr7\Request;
 use Throwable;
 use Exception;
 use GuzzleHttp\Psr7\ServerRequest;
+use App\Exception\DBException;
 
 class CustomErrorHandler
 {
@@ -42,7 +43,7 @@ class CustomErrorHandler
         } else if($exception instanceof HttpNotFoundException){
             $this->logger->critical($exception->getMessage());
             $statusCode = 404;
-        }else if($exception instanceof Exception) {
+        }else if($exception instanceof DBException) {
             $this->logger->alert($exception->getMessage());
             $statusCode = $exception->getCode();
         }

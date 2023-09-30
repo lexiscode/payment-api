@@ -112,7 +112,7 @@ $container->set(CategoryRepository::class, function (Container $container){
 $container->set(App\Controllers\CategoryController::class, function (Container $c) {
     return new App\Controllers\CategoryController(
         $c->get(App\Repositories\CategoryRepository::class),
-        $c->get(Logger::class) // Inject the Logger here
+        $c->get(Logger::class) // Inject the Logger here also
     );
 });
 

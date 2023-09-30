@@ -8,6 +8,7 @@ use App\Repositories\CategoryRepository;
 use Laminas\Diactoros\Response\JsonResponse;
 use Slim\Exception\HttpNotFoundException;
 use App\Model\Category;
+use App\Exception\DBException;
 
 use Monolog\Logger;
 use Slim\App;
@@ -40,8 +41,7 @@ class CategoryController
 
         } catch (\Exception $e) {
             // Handle exceptions and errors here
-            throw new \Exception('Internal Server Error', 500);
-            error_log($e->getMessage());
+            throw new DBException('Internal Server Error', 500);
 
             $responseData = [
                 "success" => false,
@@ -64,7 +64,7 @@ class CategoryController
             $category = $this->categoryRepository->findById($id);
 
             if ($category === null) {
-                //throw new HttpNotFoundException('Category not found', 404);
+
                 $this->logger->info("Status 404: Category not found with this id:$id");
                 return new JsonResponse(['message' => 'Category not found'], 404);
             }
@@ -76,18 +76,8 @@ class CategoryController
             
         } catch (\Exception $e) {
             // Handle exceptions and errors here
-            throw new \Exception('Internal Server Error', 500);
-            error_log($e->getMessage());
+            throw new DBException('Internal Server Error', 500);
 
-            $responseData = [
-                "success" => false,
-                "error" => "Internal Server Error",
-                "message" => "An error occurred while creating the category",
-                "status" => 500,
-                "path" => "/v1/category"
-            ];
-
-            return new JsonResponse($responseData, 500);
         }
     }
 
@@ -105,7 +95,7 @@ class CategoryController
                     "path" => "/v1/category"
                 ];
 
-                $this->logger->info('Status 400: Invalid JSON data (Bad request).');
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
                 return new JsonResponse($responseData, 400);
             }
 
@@ -122,22 +112,12 @@ class CategoryController
                 "status" => 200,
                 "path" => "/v1/category"
             ];
-
             return new JsonResponse($responseData, 200);
+
         } catch (\Exception $e) {
             // Handle exceptions and errors here
-            throw new \Exception('Internal Server Error', 500);
-            error_log($e->getMessage());
+            throw new DBException('Internal Server Error', 500);
 
-            $responseData = [
-                "success" => false,
-                "error" => "Internal Server Error",
-                "message" => "An error occurred while creating the category",
-                "status" => 500,
-                "path" => "/v1/category"
-            ];
-
-            return new JsonResponse($responseData, 500);
         }
     }
 
@@ -160,6 +140,8 @@ class CategoryController
                         "status" => 404,
                         "path" => "/v1/category/$id"
                     ];
+
+                    $this->logger->info("Status 404: Category not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
@@ -183,22 +165,14 @@ class CategoryController
                     "status" => 400,
                     "path" => "/v1/category/$id"
                 ];
+
+                $this->logger->info("Status 400: Bad Request", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
             // Handle exceptions and errors here
-            throw new \Exception('Internal Server Error', 500);
-            error_log($e->getMessage());
+            throw new DBException('Internal Server Error', 500);
 
-            $responseData = [
-                "success" => false,
-                "error" => "Internal Server Error",
-                "message" => "An error occurred while updating the category",
-                "status" => 500,
-                "path" => "/v1/category/$id"
-            ];
-
-            return new JsonResponse($responseData, 500);
         }
     }
 
@@ -220,6 +194,8 @@ class CategoryController
                         "status" => 404,
                         "path" => "/v1/category/$id"
                     ];
+
+                    $this->logger->info("Status 404: Category not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
@@ -242,6 +218,7 @@ class CategoryController
                 ];
 
                 return new JsonResponse($responseData, 200);
+
             } else {
                 $responseData = [
                     "success" => false,
@@ -249,28 +226,20 @@ class CategoryController
                     "status" => 400,
                     "path" => "/v1/category/$id"
                 ];
+
+                $this->logger->info("Status 400: Bad Request.", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
             // Handle exceptions and errors here
-            throw new \Exception('Internal Server Error', 500);
-            error_log($e->getMessage());
-
-            $responseData = [
-                "success" => false,
-                "error" => "Internal Server Error",
-                "message" => "An error occurred while updating the category",
-                "status" => 500,
-                "path" => "/v1/category/$id"
-            ];
-
-            return new JsonResponse($responseData, 500);
+            throw new DBException('Internal Server Error', 500);
         }
     }
 
-    public function deleteCategory(Request $request, Response $response, array $args): Response
+    public function deleteCategory(array $args): Response
     {
         try {
+
             $id = htmlspecialchars($args['id']);
 
             if ($id > 0) {
@@ -284,6 +253,8 @@ class CategoryController
                         "status" => 404,
                         "path" => "/v1/category/$id"
                     ];
+
+                    $this->logger->info("Status 404: Category not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
@@ -297,6 +268,7 @@ class CategoryController
                 ];
 
                 return new JsonResponse($responseData, 200);
+
             } else {
                 $responseData = [
                     "success" => false,
@@ -304,25 +276,16 @@ class CategoryController
                     "status" => 400,
                     "path" => "/v1/category/$id"
                 ];
+
+                $this->logger->info("Status 400: Bad Request!", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
             // Handle exceptions and errors here
             throw new \Exception('Internal Server Error', 500);
-            error_log($e->getMessage());
 
-            $responseData = [
-                "success" => false,
-                "error" => "Internal Server Error",
-                "message" => "An error occurred while deleting the category",
-                "status" => 500,
-                "path" => "/v1/category/$id"
-            ];
-
-            return new JsonResponse($responseData, 500);
         }
     }
 
 }
-
 
