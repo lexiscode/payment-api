@@ -2,27 +2,33 @@
 
 namespace App\Controllers;
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use App\Repositories\CategoryRepository;
-use Laminas\Diactoros\Response\JsonResponse;
-use Slim\Exception\HttpNotFoundException;
+use Slim\App;
+use Monolog\Logger;
 use App\Model\Category;
 use App\Exception\DBException;
+use Psr\Container\ContainerInterface;
+use App\Repositories\CategoryRepository;
+use Slim\Exception\HttpNotFoundException;
 
-use Monolog\Logger;
-use Slim\App;
+use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class CategoryController
 {
     private $categoryRepository;
     private $logger;
 
-    public function __construct(CategoryRepository $categoryRepository, Logger $logger)
+    public function __construct(ContainerInterface $container)
+    {
+        $this->categoryRepository = $container->get(CategoryRepository::class);
+        $this->logger = $container->get(Logger::class);
+    }
+    /*public function __construct(CategoryRepository $categoryRepository, Logger $logger)
     {
         $this->categoryRepository = $categoryRepository;
         $this->logger = $logger;
-    }
+    }*/
     
 
     public function getAllCategories(Request $request, Response $response): Response

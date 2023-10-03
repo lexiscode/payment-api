@@ -108,6 +108,7 @@ $container->set(CategoryRepository::class, function (Container $container){
 });
 
 
+/*
 // Define the CategoryController and inject dependencies
 $container->set(App\Controllers\CategoryController::class, function (Container $c) {
     return new App\Controllers\CategoryController(
@@ -115,6 +116,7 @@ $container->set(App\Controllers\CategoryController::class, function (Container $
         $c->get(Logger::class) // Inject the Logger here also
     );
 });
+*/
 
 
 return $container;

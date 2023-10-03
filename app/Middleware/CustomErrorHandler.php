@@ -24,7 +24,7 @@ class CustomErrorHandler
     }
 
     public function __invoke(
-        ServerRequest    $request, // Change the type hint here
+        ServerRequest    $request, 
         Throwable        $exception,
         bool             $displayErrorDetails,
         bool             $logErrors,
