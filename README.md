@@ -1,2 +1,2 @@
-# slim-docker-api
+# payment-api
 Still in the works!

@@ -7,3 +7,4 @@
 [2023-10-03T15:13:51.193580+00:00] slim-docker-api.CRITICAL: Not found. [] []
 [2023-10-03T15:17:51.400761+00:00] slim-docker-api.INFO: Status 400: Invalid JSON data (Bad request). {"success":false,"message":"Invalid or incomplete JSON data","status":400,"path":"/v1/category"} []
 [2023-10-03T15:19:19.528724+00:00] slim-docker-api.INFO: Status 400: Invalid JSON data (Bad request). {"success":false,"message":"Invalid or incomplete JSON data","status":400,"path":"/v1/category"} []
+[2023-10-07T12:04:36.983523+00:00] slim-docker-api.CRITICAL: Not found. [] []

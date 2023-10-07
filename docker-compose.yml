@@ -3,11 +3,10 @@ version: '3.1'
 services:
     mariadb:
         image: 'mariadb:11.0'
-        container_name: slim_api_mariadb
+        container_name: payment_api_mariadb
         working_dir: /application
         volumes:
             - '.:/application'
-            - './cli/import.sql:/docker-entrypoint-initdb.d/import.sql'
         environment:
             - 'MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}'
             - 'MYSQL_DATABASE=${MARIADB_DB_NAME}'
@@ -18,7 +17,7 @@ services:
 
     webserver:
         image: 'nginx:alpine'
-        container_name: slim_api_webserver
+        container_name: payment_api_webserver
         working_dir: /application
         volumes:
             - '.:/application'
@@ -28,7 +27,7 @@ services:
 
     php-fpm:
         build: phpdocker/php-fpm
-        container_name: slim_api_php
+        container_name: payment_api_php
         working_dir: /application
         volumes:
             - '.:/application'
@@ -36,7 +35,7 @@ services:
 
     phpmyadmin:
         image: 'phpmyadmin/phpmyadmin:latest'
-        container_name: slim_api_phpmyadmin
+        container_name: payment_api_phpmyadmin
         ports:
             - '8001:80'
         environment:
@@ -45,7 +44,7 @@ services:
 
     composer:
         image: 'composer:latest'
-        container_name: slim_api_composer
+        container_name: payment_api_composer
         command: [ "composer", "update" ]
         volumes:
             - '.:/application'
