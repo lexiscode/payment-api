@@ -128,6 +128,20 @@ class MethodController
             $jsonBody = $request->getBody();
             $methodInfo = json_decode($jsonBody, true);
 
+            // Check if JSON decoding was valid and successful
+            if ($methodInfo === null) {
+
+                $responseData = [
+                    "success" => false,
+                    "message" => "Invalid or incomplete JSON data",
+                    "status" => 400,
+                    "path" => "/v1/methods"
+                ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
+                return new JsonResponse($responseData, 400);
+            }
+
             if ($id > 0) {
                 $methodRepository = $this->methodRepository;
                 $method = $methodRepository->findById($id);
@@ -159,12 +173,12 @@ class MethodController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid method ID.",
+                    "message" => "Bad request. ID must be greater than zero.",
                     "status" => 400,
                     "path" => "/v1/methods/$id"
                 ];
 
-                $this->logger->info("Status 400: Bad Request", $responseData);
+                $this->logger->alert("Status 400: Bad Request", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
@@ -180,6 +194,20 @@ class MethodController
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
             $methodInfo = json_decode($jsonBody, true);
+
+            // Check if JSON decoding was valid and successful
+            if ($methodInfo === null) {
+
+                $responseData = [
+                    "success" => false,
+                    "message" => "Invalid or incomplete JSON data",
+                    "status" => 400,
+                    "path" => "/v1/methods"
+                ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
+                return new JsonResponse($responseData, 400);
+            }
 
             if ($id > 0) {
                 $methodRepository = $this->methodRepository;
@@ -199,11 +227,20 @@ class MethodController
 
                 // Partially update category properties if provided in the request
                 if (isset($methodInfo['name'])) {
-                    $method->setName($methodInfo['name']);
-                }
 
-                if (isset($methodInfo['address'])) {
-                    $method->setDescription($methodInfo['address']);
+                    if (!is_string($methodInfo['name'])){
+                        $errorResponse = [
+                            "success" => false,
+                            "message" => "Request must be of type 'string'.",
+                            "status" => 400,
+                            "path" => "/v1/customers"
+                        ];
+    
+                        $this->logger->alert("Status 400: Bad Request", $errorResponse);
+                        return new JsonResponse($errorResponse, 400);
+                    }
+
+                    $method->setName($methodInfo['name']);
                 }
 
                 $methodRepository->update($method);
@@ -220,12 +257,12 @@ class MethodController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid method ID.",
+                    "message" => "Bad request. ID must be greater than zero.",
                     "status" => 400,
                     "path" => "/v1/methods/$id"
                 ];
 
-                $this->logger->info("Status 400: Bad Request.", $responseData);
+                $this->logger->alert("Status 400: Bad Request.", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
@@ -234,7 +271,7 @@ class MethodController
         }
     }
 
-    public function deleteMethod(array $args): Response
+    public function deleteMethod(Request $request, Response $response, array $args): Response
     {
         try {
 

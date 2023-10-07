@@ -127,6 +127,20 @@ class PaymentController
             $jsonBody = $request->getBody();
             $paymentInfo = json_decode($jsonBody, true);
 
+            // Check if JSON decoding was valid and successful
+            if ($paymentInfo === null) {
+
+                $responseData = [
+                    "success" => false,
+                    "message" => "Invalid or incomplete JSON data",
+                    "status" => 400,
+                    "path" => "/v1/payments"
+                ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
+                return new JsonResponse($responseData, 400);
+            }
+
             if ($id > 0) {
                 $paymentRepository = $this->paymentRepository;
                 $payment = $paymentRepository->findById($id);
@@ -143,8 +157,19 @@ class PaymentController
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $payment->setName($paymentInfo['name']);
-                $payment->setDescription($paymentInfo['description']);
+                if (!is_float($paymentInfo['sum']) && !is_integer($paymentInfo['sum'])){
+                    $errorResponse = [
+                        "success" => false,
+                        "message" => "Request must be either a float or an integer only.",
+                        "status" => 400,
+                        "path" => "/v1/payments"
+                    ];
+
+                    $this->logger->alert("Status 400: Bad Request", $errorResponse);
+                    return new JsonResponse($errorResponse, 404);
+                }
+
+                $payment->setSum($paymentInfo['sum']);
 
                 $paymentRepository->update($payment);
 
@@ -159,12 +184,12 @@ class PaymentController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid payment ID.",
+                    "message" => "Bad request. ID must be greater than zero.",
                     "status" => 400,
                     "path" => "/v1/payments/$id"
                 ];
 
-                $this->logger->info("Status 400: Bad Request", $responseData);
+                $this->logger->alert("Status 400: Bad Request", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
@@ -180,6 +205,20 @@ class PaymentController
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
             $paymentInfo = json_decode($jsonBody, true);
+
+            // Check if JSON decoding was valid and successful
+            if ($paymentInfo === null) {
+
+                $responseData = [
+                    "success" => false,
+                    "message" => "Invalid or incomplete JSON data",
+                    "status" => 400,
+                    "path" => "/v1/payments"
+                ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
+                return new JsonResponse($responseData, 400);
+            }
 
             if ($id > 0) {
                 $paymentRepository = $this->paymentRepository;
@@ -199,7 +238,20 @@ class PaymentController
 
                 // Partially update category properties if provided in the request
                 if (isset($paymentInfo['sum'])) {
-                    $payment->setName($paymentInfo['sum']);
+
+                    if (!is_float($paymentInfo['sum']) && !is_integer($paymentInfo['sum'])){
+                        $errorResponse = [
+                            "success" => false,
+                            "message" => "Request must be either a float or an integer only.",
+                            "status" => 400,
+                            "path" => "/v1/payments"
+                        ];
+    
+                        $this->logger->alert("Status 400: Bad Request", $errorResponse);
+                        return new JsonResponse($errorResponse, 400);
+                    }
+
+                    $payment->setSum($paymentInfo['sum']);
                 }
 
                 $paymentRepository->update($payment);
@@ -230,7 +282,7 @@ class PaymentController
         }
     }
 
-    public function deletePayment(array $args): Response
+    public function deletePayment(Request $request, Response $response, array $args): Response
     {
         try {
 
@@ -266,7 +318,7 @@ class PaymentController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid payment ID.",
+                    "message" => "Bad request. ID must be greater than zero.",
                     "status" => 400,
                     "path" => "/v1/payments/$id"
                 ];

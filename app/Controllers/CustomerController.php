@@ -129,6 +129,20 @@ class CustomerController
             $jsonBody = $request->getBody();
             $customerInfo = json_decode($jsonBody, true);
 
+            // Check if JSON decoding was valid and successful
+            if ($customerInfo === null) {
+
+                $responseData = [
+                    "success" => false,
+                    "message" => "Invalid or incomplete JSON data",
+                    "status" => 400,
+                    "path" => "/v1/customers"
+                ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
+                return new JsonResponse($responseData, 400);
+            }
+
             if ($id > 0) {
                 $customerRepository = $this->customerRepository;
                 $customer = $customerRepository->findById($id);
@@ -146,7 +160,7 @@ class CustomerController
                 }
 
                 $customer->setName($customerInfo['name']);
-                $customer->setDescription($customerInfo['description']);
+                $customer->setAddress($customerInfo['address']);
 
                 $customerRepository->update($customer);
 
@@ -161,12 +175,12 @@ class CustomerController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. ID must be greater than zero.",
                     "status" => 400,
                     "path" => "/v1/customers/$id"
                 ];
 
-                $this->logger->info("Status 400: Bad Request", $responseData);
+                $this->logger->alert("Status 400: Bad Request", $responseData);
                 return new JsonResponse($responseData, 400);
             }
         } catch (\Exception $e) {
@@ -182,6 +196,20 @@ class CustomerController
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
             $customerInfo = json_decode($jsonBody, true);
+
+            // Check if JSON decoding was valid and successful
+            if ($customerInfo === null) {
+
+                $responseData = [
+                    "success" => false,
+                    "message" => "Invalid or incomplete JSON data",
+                    "status" => 400,
+                    "path" => "/v1/customers"
+                ];
+
+                $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
+                return new JsonResponse($responseData, 400);
+            }
 
             if ($id > 0) {
                 $customerRepository = $this->customerRepository;
@@ -201,11 +229,37 @@ class CustomerController
 
                 // Partially update category properties if provided in the request
                 if (isset($customerInfo['name'])) {
+
+                    if (!is_string($customerInfo['name'])){
+                        $errorResponse = [
+                            "success" => false,
+                            "message" => "Request must be of type 'string'.",
+                            "status" => 400,
+                            "path" => "/v1/customers"
+                        ];
+    
+                        $this->logger->alert("Status 400: Bad Request", $errorResponse);
+                        return new JsonResponse($errorResponse, 400);
+                    }
+
                     $customer->setName($customerInfo['name']);
                 }
 
                 if (isset($customerInfo['address'])) {
-                    $customer->setDescription($customerInfo['address']);
+
+                    if (!is_string($customerInfo['address'])){
+                        $errorResponse = [
+                            "success" => false,
+                            "message" => "Request must be of type 'string'.",
+                            "status" => 400,
+                            "path" => "/v1/customers"
+                        ];
+    
+                        $this->logger->alert("Status 400: Bad Request", $errorResponse);
+                        return new JsonResponse($errorResponse, 400);
+                    }
+
+                    $customer->setAddress($customerInfo['address']);
                 }
 
                 $customerRepository->update($customer);
@@ -222,7 +276,7 @@ class CustomerController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. ID must be greater than zero.",
                     "status" => 400,
                     "path" => "/v1/customers/$id"
                 ];
@@ -236,7 +290,7 @@ class CustomerController
         }
     }
 
-    public function deleteCustomer(array $args): Response
+    public function deleteCustomer(Request $request, Response $response, array $args): Response
     {
         try {
 
