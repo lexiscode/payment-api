@@ -4,39 +4,39 @@ namespace App\Controllers;
 
 use Slim\App;
 use Monolog\Logger;
-use App\Model\Customer;
+use App\Model\Payment;
 use App\Exception\DBException;
 use Psr\Container\ContainerInterface;
-use App\Repositories\CustomerRepository;
+use App\Repositories\PaymentRepository;
 use Slim\Exception\HttpNotFoundException;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class CustomerController
+class PaymentController
 {
-    private $customerRepository;
+    private $paymentRepository;
     private $logger;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->customerRepository = $container->get(CustomerRepository::class);
+        $this->paymentRepository = $container->get(PaymentRepository::class);
         $this->logger = $container->get(Logger::class);
     }
     
-    public function getAllCustomers(Request $request, Response $response): Response
+    public function getAllPayments(Request $request, Response $response): Response
     {
         try{
 
-            $customers = $this->customerRepository->findAll();
+            $payments = $this->paymentRepository->findAll();
 
-            $customerData = [];
-            foreach ($customers as $customer) {
-                $customerData[] = $customer->toArray();
+            $paymentData = [];
+            foreach ($payments as $payment) {
+                $paymentData[] = $payment->toArray();
             }
 
-            $response->getBody()->write(json_encode($customerData));
+            $response->getBody()->write(json_encode($paymentData));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 
         } catch (\Exception $e) {
@@ -46,9 +46,9 @@ class CustomerController
             $responseData = [
                 "success" => false,
                 "error" => "Internal Server Error",
-                "message" => "An error occurred while creating the customer",
+                "message" => "An error occurred while creating the payment.",
                 "status" => 500,
-                "path" => "/v1/customers"
+                "path" => "/v1/payments"
             ];
 
             return new JsonResponse($responseData, 500);
@@ -56,22 +56,22 @@ class CustomerController
         
     }
 
-    public function getCategoryById(Request $request, Response $response, array $args): Response
+    public function getPaymentById(Request $request, Response $response, array $args): Response
     {
         try{
 
             $id = htmlspecialchars($args['id']);
-            $customer = $this->customerRepository->findById($id);
+            $payment = $this->paymentRepository->findById($id);
 
-            if ($customer === null) {
+            if ($payment === null) {
 
-                $this->logger->info("Status 404: Customer not found with this id:$id");
-                return new JsonResponse(['message' => 'Customer not found'], 404);
+                $this->logger->info("Status 404: Payment not found with this id:$id");
+                return new JsonResponse(['message' => 'Payment not found'], 404);
             }
 
-            $customerData = $customer->toArray();
+            $paymentData = $payment->toArray();
 
-            $response->getBody()->write(json_encode($customerData));
+            $response->getBody()->write(json_encode($paymentData));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             
         } catch (\Exception $e) {
@@ -81,89 +81,87 @@ class CustomerController
         }
     }
 
-    public function createCategory(Request $request, Response $response): Response
+    public function createPayment(Request $request, Response $response): Response
     {
         try {
             $jsonBody = $request->getBody();
-            $customerInfo = json_decode($jsonBody, true);
+            $paymentInfo = json_decode($jsonBody, true);
 
-            if (!$customerInfo || !isset($customerInfo['name']) || !isset($customerInfo['address'])) {
+            if (!$paymentInfo || !isset($paymentInfo['sum'])) {
                 $responseData = [
                     "success" => false,
                     "message" => "Invalid or incomplete JSON data",
                     "status" => 400,
-                    "path" => "/v1/customers"
+                    "path" => "/v1/payments"
                 ];
 
                 $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
                 return new JsonResponse($responseData, 400);
             }
 
-            $customer = new Customer();
-            $customer->setName($customerInfo['name']);
-            $customer->setAddress($customerInfo['address']);
+            $payment = new Payment();
+            $payment->setSum($paymentInfo['sum']);
 
-            $customerRepository = $this->customerRepository;
-            $customerRepository->store($customer);
+            $paymentRepository = $this->paymentRepository;
+            $paymentRepository->store($payment);
 
             $responseData = [
                 "success" => true,
-                "message" => "Customer has been created successfully",
+                "message" => "Payment has been created successfully",
                 "status" => 200,
-                "path" => "/v1/customers"
+                "path" => "/v1/payments"
             ];
             return new JsonResponse($responseData, 200);
 
         } catch (\Exception $e) {
             // Handle exceptions and errors here
             throw new DBException('Internal Server Error', 500);
-
         }
     }
 
 
-    public function putCategory(Request $request, Response $response, array $args): Response
+    public function putPayment(Request $request, Response $response, array $args): Response
     {
         try {
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
-            $customerInfo = json_decode($jsonBody, true);
+            $paymentInfo = json_decode($jsonBody, true);
 
             if ($id > 0) {
-                $customerRepository = $this->customerRepository;
-                $customer = $customerRepository->findById($id);
+                $paymentRepository = $this->paymentRepository;
+                $payment = $paymentRepository->findById($id);
 
-                if (is_null($customer)) {
+                if (is_null($payment)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Resource category not found",
+                        "message" => "Payment resource not found",
                         "status" => 404,
-                        "path" => "/v1/customers/$id"
+                        "path" => "/v1/payments/$id"
                     ];
 
-                    $this->logger->info("Status 404: Customer not found with this id:$id", $errorResponse);
+                    $this->logger->info("Status 404: Payment not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $customer->setName($customerInfo['name']);
-                $customer->setDescription($customerInfo['description']);
+                $payment->setName($paymentInfo['name']);
+                $payment->setDescription($paymentInfo['description']);
 
-                $customerRepository->update($customer);
+                $paymentRepository->update($payment);
 
                 $responseData = [
                     "success" => true,
-                    "message" => "Customer has been updated successfully.",
+                    "message" => "Payment has been updated successfully.",
                     "status" => 200,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/payments/$id"
                 ];
 
                 return new JsonResponse($responseData, 200);
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. Please provide a valid payment ID.",
                     "status" => 400,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/payments/$id"
                 ];
 
                 $this->logger->info("Status 400: Bad Request", $responseData);
@@ -176,45 +174,41 @@ class CustomerController
         }
     }
 
-    public function patchCategory(Request $request, Response $response, array $args): Response
+    public function patchPayment(Request $request, Response $response, array $args): Response
     {
         try {
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
-            $customerInfo = json_decode($jsonBody, true);
+            $paymentInfo = json_decode($jsonBody, true);
 
             if ($id > 0) {
-                $customerRepository = $this->customerRepository;
-                $customer = $customerRepository->findById($id);
+                $paymentRepository = $this->paymentRepository;
+                $payment = $paymentRepository->findById($id);
 
-                if (is_null($customer)) {
+                if (is_null($payment)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Resource customer not found",
+                        "message" => "Payment resource not found",
                         "status" => 404,
-                        "path" => "/v1/customer/$id"
+                        "path" => "/v1/payment/$id"
                     ];
 
-                    $this->logger->info("Status 404: Customer not found with this id:$id", $errorResponse);
+                    $this->logger->info("Status 404: Payment not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
                 // Partially update category properties if provided in the request
-                if (isset($customerInfo['name'])) {
-                    $customer->setName($customerInfo['name']);
+                if (isset($paymentInfo['sum'])) {
+                    $payment->setName($paymentInfo['sum']);
                 }
 
-                if (isset($customerInfo['address'])) {
-                    $customer->setDescription($customerInfo['address']);
-                }
-
-                $customerRepository->update($customer);
+                $paymentRepository->update($payment);
 
                 $responseData = [
                     "success" => true,
-                    "message" => "Customer has been updated successfully.",
+                    "message" => "Payment has been updated successfully.",
                     "status" => 200,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/payments/$id"
                 ];
 
                 return new JsonResponse($responseData, 200);
@@ -222,9 +216,9 @@ class CustomerController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. Please provide a valid payment ID.",
                     "status" => 400,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/payments/$id"
                 ];
 
                 $this->logger->info("Status 400: Bad Request.", $responseData);
@@ -236,35 +230,35 @@ class CustomerController
         }
     }
 
-    public function deleteCategory(array $args): Response
+    public function deletePayment(array $args): Response
     {
         try {
 
             $id = htmlspecialchars($args['id']);
 
             if ($id > 0) {
-                $customerRepository = $this->customerRepository;
-                $customer = $customerRepository->findById($id);
+                $paymentRepository = $this->paymentRepository;
+                $payment = $paymentRepository->findById($id);
 
-                if (is_null($customer)) {
+                if (is_null($payment)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Resource customer not found",
+                        "message" => "Payment resource not found",
                         "status" => 404,
-                        "path" => "/v1/customer/$id"
+                        "path" => "/v1/payments/$id"
                     ];
 
-                    $this->logger->info("Status 404: Customer not found with this id:$id", $errorResponse);
+                    $this->logger->info("Status 404: Payment not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $customerRepository->remove($customer);
+                $paymentRepository->remove($payment);
 
                 $responseData = [
                     "success" => true,
-                    "message" => "Customer has been deleted successfully.",
+                    "message" => "Payment has been deleted successfully.",
                     "status" => 200,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/payments/$id"
                 ];
 
                 return new JsonResponse($responseData, 200);
@@ -272,9 +266,9 @@ class CustomerController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. Please provide a valid payment ID.",
                     "status" => 400,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/payments/$id"
                 ];
 
                 $this->logger->info("Status 400: Bad Request!", $responseData);
@@ -288,3 +282,4 @@ class CustomerController
     }
 
 }
+
