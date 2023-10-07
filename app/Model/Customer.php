@@ -5,15 +5,14 @@ namespace App\Model;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 
-// use Doctrine\ORM\Mapping as ORM; - alternatively can be used rather than the imports below
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
 
 
-#[Entity, Table(name: 'categories')]
-class Category
+#[Entity, Table(name: 'customers')]
+class Customer
 {
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
     private $id;
@@ -22,7 +21,7 @@ class Category
     private $name;
 
     #[Column(type: 'text')]
-    private $description;
+    private $address;
 
     #[Column(name: 'created_at', type: 'datetimetz_immutable', nullable: false)]
     private DateTimeImmutable $created_at;
@@ -53,14 +52,14 @@ class Category
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getAddress(): ?string
     {
-        return $this->description;
+        return $this->address;
     }
 
-    public function setDescription(string $description): self
+    public function setAddress(string $address): self
     {
-        $this->description = $description;
+        $this->address = $address;
 
         return $this;
     }
@@ -92,20 +91,19 @@ class Category
     /**
      * Doctrine entities are often designed to be serialized in a specific way, and by default, 
      * some properties may not be accessible for serialization.
-     * This method returns an array representation of the entity's data.
+     * 
+     * Therefore, this method returns an array representation of the entity's data.
      */
     public function toArray(): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'description' => $this->description,
+            'address' => $this->address,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 
 }
-
-
 

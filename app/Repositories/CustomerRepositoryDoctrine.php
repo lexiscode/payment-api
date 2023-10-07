@@ -2,15 +2,15 @@
 
 namespace App\Repositories;
 
-use App\Model\Category;
+use App\Model\Customer;
 use Doctrine\ORM\EntityManager;
-use App\Repositories\CategoryRepository;
+use App\Repositories\CustomerRepository;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 
 
-class CategoryRepositoryDoctrine implements CategoryRepository
+class CustomerRepositoryDoctrine implements CustomerRepository
 {
     private $entityManager;
     
@@ -23,9 +23,9 @@ class CategoryRepositoryDoctrine implements CategoryRepository
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function store(Category $category): void
+    public function store(Customer $customer): void
     {
-        $this->entityManager->persist($category);
+        $this->entityManager->persist($customer);
         $this->entityManager->flush();  
     }
 
@@ -33,9 +33,9 @@ class CategoryRepositoryDoctrine implements CategoryRepository
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function remove(Category $category): void
+    public function remove(Customer $customer): void
     {
-        $this->entityManager->remove($category);
+        $this->entityManager->remove($customer);
         $this->entityManager->flush();
     }
 
@@ -43,9 +43,9 @@ class CategoryRepositoryDoctrine implements CategoryRepository
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function update(Category $category): void
+    public function update(Customer $customer): void
     {
-        $this->entityManager->persist($category);
+        $this->entityManager->persist($customer);
         $this->entityManager->flush();
     }
 
@@ -54,16 +54,16 @@ class CategoryRepositoryDoctrine implements CategoryRepository
      */
     public function findAll(): array
     {
-        return $this->entityManager->getRepository(Category::class)->findAll();
+        return $this->entityManager->getRepository(Customer::class)->findAll();
     }
 
     /**
      * @throws NotSupported
      */
-    public function findById(int $id): Category|null
+    public function findById(int $id): Customer|null
     {
         
-        return $this->entityManager->getRepository(Category::class)->find($id);
+        return $this->entityManager->getRepository(Customer::class)->find($id);
        
     }
 

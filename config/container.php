@@ -9,8 +9,8 @@ use Monolog\Handler\StreamHandler;
 
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Formatter\LineFormatter;
-use App\Repositories\CategoryRepository;
-use App\Repositories\CategoryRepositoryDoctrine;
+use App\Repositories\CustomerRepository;
+use App\Repositories\CustomerRepositoryDoctrine;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -65,8 +65,6 @@ $container->set(EntityManager::class, function (Container $c): EntityManager {
     /** @var array $settings */
     $settings = $c->get('settings');
 
-    // Use the ArrayAdapter or the FilesystemAdapter depending on the value of the 'dev_mode' setting
-    // You can substitute the FilesystemAdapter for any other cache you prefer from the symfony/cache library
     $cache = $settings['doctrine']['dev_mode'] ?
         DoctrineProvider::wrap(new ArrayAdapter()) :
         DoctrineProvider::wrap(new FilesystemAdapter(directory: $settings['doctrine']['cache_dir']));
@@ -84,7 +82,7 @@ $container->set(EntityManager::class, function (Container $c): EntityManager {
 
 // Monologging
 $container->set(Logger::class, function (Container $container){
-    $logger = new Logger('slim-docker-api');
+    $logger = new Logger('payment-api');
 
     $output = "%level_name% | %datetime% > %message% | %context% %extra%\n";
     $dateFormat = "Y-m-d, H:i:s";
@@ -101,22 +99,11 @@ $container->set(Logger::class, function (Container $container){
 });
 
 
-// Creating a container instance for CategoryRepository
-$container->set(CategoryRepository::class, function (Container $container){
+// Creating a container instance for CustomerRepository
+$container->set(CustomerRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
-    return new CategoryRepositoryDoctrine($em);
+    return new CustomerRepositoryDoctrine($em);
 });
-
-
-/*
-// Define the CategoryController and inject dependencies
-$container->set(App\Controllers\CategoryController::class, function (Container $c) {
-    return new App\Controllers\CategoryController(
-        $c->get(App\Repositories\CategoryRepository::class),
-        $c->get(Logger::class) // Inject the Logger here also
-    );
-});
-*/
 
 
 return $container;

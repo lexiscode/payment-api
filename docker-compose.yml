@@ -48,3 +48,4 @@ services:
         command: [ "composer", "update" ]
         volumes:
             - '.:/application'
+

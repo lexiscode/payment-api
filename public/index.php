@@ -18,20 +18,16 @@ $dotenv->safeLoad();
 $app = AppFactory::create(container: $container);
 $container = $app->getContainer(); // used in the normal Doctrine queries
 
-// Dealing with createQuery/Builder use of EntityManager class in this cases
-// $em = $container->get(EntityManager::class);
-
 
 $app->get('/', function (Request $request, Response $response, array $args) {
-    $name = 'Alexander!';
-    $response->getBody()->write("Hello, $name");
+    $name = 'Welcome to Lexis Payment-API!';
+    $response->getBody()->write("Hello! $name");
     return $response;
 });
 
 
 // Define routes using controllers
-require "../routes/category.php";
-require "../routes/reference.php";
+require "../routes/customers.php";
 
 
 // Default slim error message four route that doesn't exists
