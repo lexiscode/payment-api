@@ -27,7 +27,7 @@ $app->get('/', function (Request $request, Response $response, array $args) {
 
 
 // Define routes using controllers
-require "../routes/customers.php";
+require "../routes/api.php";
 
 
 // Default slim error message four route that doesn't exists

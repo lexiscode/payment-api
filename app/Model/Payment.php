@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 
 use Doctrine\ORM\Mapping\Entity;
@@ -11,47 +10,32 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
 
 
-#[Entity, Table(name: 'customers')]
-class Customer
+#[Entity, Table(name: 'payments')]
+class Payment
 {
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    #[Column(type: 'string', length: 255)]
-    private $name;
-
-    #[Column(type: 'text')]
-    private $address;
-
+    #[Column(name: 'sum', type: 'float', nullable: false)]
+    private float $sum;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getSum(): ?string
     {
-        return $this->name;
+        return $this->sum;
     }
 
-    public function setName(string $name): self
+    public function setSum(string $sum): self
     {
-        $this->name = $name;
+        $this->sum = $sum;
 
         return $this;
     }
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
 
     /**
      * Doctrine entities are often designed to be serialized in a specific way, and by default, 
@@ -63,8 +47,7 @@ class Customer
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'address' => $this->address,
+            'sum' => $this->sum,
         ];
     }
 

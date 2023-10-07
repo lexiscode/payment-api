@@ -11,6 +11,10 @@ use Monolog\Formatter\JsonFormatter;
 use Monolog\Formatter\LineFormatter;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerRepositoryDoctrine;
+use App\Repositories\MethodRepository;
+use App\Repositories\MethodRepositoryDoctrine;
+use App\Repositories\PaymentRepository;
+use App\Repositories\PaymentRepositoryDoctrine;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -103,6 +107,18 @@ $container->set(Logger::class, function (Container $container){
 $container->set(CustomerRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new CustomerRepositoryDoctrine($em);
+});
+
+// Creating a container instance for PaymentRepository
+$container->set(PaymentRepository::class, function (Container $container){
+    $em = $container->get(EntityManager::class);
+    return new PaymentRepositoryDoctrine($em);
+});
+
+// Creating a container instance for MethodRepository
+$container->set(MethodRepository::class, function (Container $container){
+    $em = $container->get(EntityManager::class);
+    return new MethodRepositoryDoctrine($em);
 });
 
 

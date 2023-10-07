@@ -4,39 +4,39 @@ namespace App\Controllers;
 
 use Slim\App;
 use Monolog\Logger;
-use App\Model\Customer;
+use App\Model\Method;
 use App\Exception\DBException;
 use Psr\Container\ContainerInterface;
-use App\Repositories\CustomerRepository;
+use App\Repositories\MethodRepository;
 use Slim\Exception\HttpNotFoundException;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class CustomerController
+class MethodController
 {
-    private $customerRepository;
+    private $methodRepository;
     private $logger;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->customerRepository = $container->get(CustomerRepository::class);
+        $this->methodRepository = $container->get(MethodRepository::class);
         $this->logger = $container->get(Logger::class);
     }
     
-    public function getAllCustomers(Request $request, Response $response): Response
+    public function getAllMethods(Request $request, Response $response): Response
     {
         try{
 
-            $customers = $this->customerRepository->findAll();
+            $methods = $this->methodRepository->findAll();
 
-            $customerData = [];
-            foreach ($customers as $customer) {
-                $customerData[] = $customer->toArray();
+            $methodData = [];
+            foreach ($methods as $method) {
+                $methodData[] = $method->toArray();
             }
 
-            $response->getBody()->write(json_encode($customerData));
+            $response->getBody()->write(json_encode($methodData));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 
         } catch (\Exception $e) {
@@ -46,9 +46,9 @@ class CustomerController
             $responseData = [
                 "success" => false,
                 "error" => "Internal Server Error",
-                "message" => "An error occurred while creating the customer",
+                "message" => "An error occurred while creating the method",
                 "status" => 500,
-                "path" => "/v1/customers"
+                "path" => "/v1/methods"
             ];
 
             return new JsonResponse($responseData, 500);
@@ -56,22 +56,22 @@ class CustomerController
         
     }
 
-    public function getCustomerById(Request $request, Response $response, array $args): Response
+    public function getMethodById(Request $request, Response $response, array $args): Response
     {
         try{
 
             $id = htmlspecialchars($args['id']);
-            $customer = $this->customerRepository->findById($id);
+            $method = $this->methodRepository->findById($id);
 
-            if ($customer === null) {
+            if ($method === null) {
 
-                $this->logger->info("Status 404: Customer not found with this id:$id");
-                return new JsonResponse(['message' => 'Customer not found'], 404);
+                $this->logger->info("Status 404: Method not found with this id:$id");
+                return new JsonResponse(['message' => 'Method not found'], 404);
             }
 
-            $customerData = $customer->toArray();
+            $methodData = $method->toArray();
 
-            $response->getBody()->write(json_encode($customerData));
+            $response->getBody()->write(json_encode($methodData));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             
         } catch (\Exception $e) {
@@ -81,36 +81,35 @@ class CustomerController
         }
     }
 
-    public function createCustomer(Request $request, Response $response): Response
+    public function createMethod(Request $request, Response $response): Response
     {
         try {
             $jsonBody = $request->getBody();
-            $customerInfo = json_decode($jsonBody, true);
+            $methodInfo = json_decode($jsonBody, true);
 
-            if (!$customerInfo || !isset($customerInfo['name']) || !isset($customerInfo['address'])) {
+            if (!$methodInfo || !isset($methodInfo['name'])) {
                 $responseData = [
                     "success" => false,
                     "message" => "Invalid or incomplete JSON data",
                     "status" => 400,
-                    "path" => "/v1/customers"
+                    "path" => "/v1/methods"
                 ];
 
                 $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
                 return new JsonResponse($responseData, 400);
             }
 
-            $customer = new Customer();
-            $customer->setName($customerInfo['name']);
-            $customer->setAddress($customerInfo['address']);
+            $method = new Method();
+            $method->setName($methodInfo['name']);
 
-            $customerRepository = $this->customerRepository;
-            $customerRepository->store($customer);
+            $methodRepository = $this->methodRepository;
+            $methodRepository->store($method);
 
             $responseData = [
                 "success" => true,
-                "message" => "Customer has been created successfully",
+                "message" => "Method has been created successfully",
                 "status" => 200,
-                "path" => "/v1/customers"
+                "path" => "/v1/methods"
             ];
             return new JsonResponse($responseData, 200);
 
@@ -122,48 +121,47 @@ class CustomerController
     }
 
 
-    public function putCustomer(Request $request, Response $response, array $args): Response
+    public function putMethod(Request $request, Response $response, array $args): Response
     {
         try {
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
-            $customerInfo = json_decode($jsonBody, true);
+            $methodInfo = json_decode($jsonBody, true);
 
             if ($id > 0) {
-                $customerRepository = $this->customerRepository;
-                $customer = $customerRepository->findById($id);
+                $methodRepository = $this->methodRepository;
+                $method = $methodRepository->findById($id);
 
-                if (is_null($customer)) {
+                if (is_null($method)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Customer resource not found",
+                        "message" => "Resource method not found",
                         "status" => 404,
-                        "path" => "/v1/customers/$id"
+                        "path" => "/v1/methods/$id"
                     ];
 
-                    $this->logger->info("Status 404: Customer not found with this id:$id", $errorResponse);
+                    $this->logger->info("Status 404: Method not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $customer->setName($customerInfo['name']);
-                $customer->setDescription($customerInfo['description']);
+                $method->setName($methodInfo['name']);
 
-                $customerRepository->update($customer);
+                $methodRepository->update($method);
 
                 $responseData = [
                     "success" => true,
-                    "message" => "Customer has been updated successfully.",
+                    "message" => "Method has been updated successfully.",
                     "status" => 200,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/methods/$id"
                 ];
 
                 return new JsonResponse($responseData, 200);
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. Please provide a valid method ID.",
                     "status" => 400,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/methods/$id"
                 ];
 
                 $this->logger->info("Status 400: Bad Request", $responseData);
@@ -176,45 +174,45 @@ class CustomerController
         }
     }
 
-    public function patchCustomer(Request $request, Response $response, array $args): Response
+    public function patchMethod(Request $request, Response $response, array $args): Response
     {
         try {
             $id = htmlspecialchars($args['id']);
             $jsonBody = $request->getBody();
-            $customerInfo = json_decode($jsonBody, true);
+            $methodInfo = json_decode($jsonBody, true);
 
             if ($id > 0) {
-                $customerRepository = $this->customerRepository;
-                $customer = $customerRepository->findById($id);
+                $methodRepository = $this->methodRepository;
+                $method = $methodRepository->findById($id);
 
-                if (is_null($customer)) {
+                if (is_null($method)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Resource customer not found",
+                        "message" => "Resource method not found",
                         "status" => 404,
-                        "path" => "/v1/customer/$id"
+                        "path" => "/v1/method/$id"
                     ];
 
-                    $this->logger->info("Status 404: Customer not found with this id:$id", $errorResponse);
+                    $this->logger->info("Status 404: Method not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
                 // Partially update category properties if provided in the request
-                if (isset($customerInfo['name'])) {
-                    $customer->setName($customerInfo['name']);
+                if (isset($methodInfo['name'])) {
+                    $method->setName($methodInfo['name']);
                 }
 
-                if (isset($customerInfo['address'])) {
-                    $customer->setDescription($customerInfo['address']);
+                if (isset($methodInfo['address'])) {
+                    $method->setDescription($methodInfo['address']);
                 }
 
-                $customerRepository->update($customer);
+                $methodRepository->update($method);
 
                 $responseData = [
                     "success" => true,
-                    "message" => "Customer has been updated successfully.",
+                    "message" => "Method has been updated successfully.",
                     "status" => 200,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/methods/$id"
                 ];
 
                 return new JsonResponse($responseData, 200);
@@ -222,9 +220,9 @@ class CustomerController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. Please provide a valid method ID.",
                     "status" => 400,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/methods/$id"
                 ];
 
                 $this->logger->info("Status 400: Bad Request.", $responseData);
@@ -236,35 +234,35 @@ class CustomerController
         }
     }
 
-    public function deleteCustomer(array $args): Response
+    public function deleteMethod(array $args): Response
     {
         try {
 
             $id = htmlspecialchars($args['id']);
 
             if ($id > 0) {
-                $customerRepository = $this->customerRepository;
-                $customer = $customerRepository->findById($id);
+                $methodRepository = $this->methodRepository;
+                $method = $methodRepository->findById($id);
 
-                if (is_null($customer)) {
+                if (is_null($method)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Resource customer not found",
+                        "message" => "Resource method not found",
                         "status" => 404,
-                        "path" => "/v1/customer/$id"
+                        "path" => "/v1/method/$id"
                     ];
 
-                    $this->logger->info("Status 404: Customer not found with this id:$id", $errorResponse);
+                    $this->logger->info("Status 404: Method not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $customerRepository->remove($customer);
+                $methodRepository->remove($method);
 
                 $responseData = [
                     "success" => true,
-                    "message" => "Customer has been deleted successfully.",
+                    "message" => "Method has been deleted successfully.",
                     "status" => 200,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/methods/$id"
                 ];
 
                 return new JsonResponse($responseData, 200);
@@ -272,9 +270,9 @@ class CustomerController
             } else {
                 $responseData = [
                     "success" => false,
-                    "message" => "Bad request. Please provide a valid category ID.",
+                    "message" => "Bad request. Please provide a valid method ID.",
                     "status" => 400,
-                    "path" => "/v1/customers/$id"
+                    "path" => "/v1/methods/$id"
                 ];
 
                 $this->logger->info("Status 400: Bad Request!", $responseData);
@@ -288,4 +286,3 @@ class CustomerController
     }
 
 }
-

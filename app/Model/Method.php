@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 
 use Doctrine\ORM\Mapping\Entity;
@@ -11,18 +10,14 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
 
 
-#[Entity, Table(name: 'customers')]
-class Customer
+#[Entity, Table(name: 'methods')]
+class Method
 {
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    #[Column(type: 'string', length: 255)]
+    #[Column(type: 'string', unique: true, nullable: false, length: 255)]
     private $name;
-
-    #[Column(type: 'text')]
-    private $address;
-
 
     public function getId(): ?int
     {
@@ -41,17 +36,6 @@ class Customer
         return $this;
     }
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
 
     /**
      * Doctrine entities are often designed to be serialized in a specific way, and by default, 
@@ -64,7 +48,6 @@ class Customer
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'address' => $this->address,
         ];
     }
 

@@ -56,7 +56,7 @@ class CustomerController
         
     }
 
-    public function getCustomerById(Request $request, Response $response, array $args): Response
+    public function getCategoryById(Request $request, Response $response, array $args): Response
     {
         try{
 
@@ -81,7 +81,7 @@ class CustomerController
         }
     }
 
-    public function createCustomer(Request $request, Response $response): Response
+    public function createCategory(Request $request, Response $response): Response
     {
         try {
             $jsonBody = $request->getBody();
@@ -122,7 +122,7 @@ class CustomerController
     }
 
 
-    public function putCustomer(Request $request, Response $response, array $args): Response
+    public function putCategory(Request $request, Response $response, array $args): Response
     {
         try {
             $id = htmlspecialchars($args['id']);
@@ -136,7 +136,7 @@ class CustomerController
                 if (is_null($customer)) {
                     $errorResponse = [
                         "success" => false,
-                        "message" => "Customer resource not found",
+                        "message" => "Resource category not found",
                         "status" => 404,
                         "path" => "/v1/customers/$id"
                     ];
@@ -176,7 +176,7 @@ class CustomerController
         }
     }
 
-    public function patchCustomer(Request $request, Response $response, array $args): Response
+    public function patchCategory(Request $request, Response $response, array $args): Response
     {
         try {
             $id = htmlspecialchars($args['id']);
@@ -236,7 +236,7 @@ class CustomerController
         }
     }
 
-    public function deleteCustomer(array $args): Response
+    public function deleteCategory(array $args): Response
     {
         try {
 
@@ -288,4 +288,3 @@ class CustomerController
     }
 
 }
-
