@@ -89,7 +89,7 @@ class AuthController
         $secret_key = "SpslTAT3s09W9LjOgt9LQ7VTpSYsZoGD5Zcg0oK3x5U=";
         $payload = [
             "email" => $email,
-            "exp" => time() + 1800, // Token expiration time (30 minutes)
+            "exp" => time() + 7200, // Token expiration time (2 hours)
         ];
         $algorithm = 'HS256';
         $token = JWT::encode($payload, $secret_key, $algorithm);
