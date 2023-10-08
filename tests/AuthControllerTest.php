@@ -21,12 +21,13 @@ class AuthControllerTest extends TestCase
        
         $container->set(EntityManager::class, function (Container $c) {
             $entityManager = Mockery::mock('Doctrine\ORM\EntityManager');
-            
-            // Set an expectation for the getClassMetadata method
-            $entityManager->shouldReceive('getClassMetadata')->andReturn(null);
+        
+            // Mock the getClassMetadata method to return a ClassMetadata mock
+            $entityManager->shouldReceive('getClassMetadata')->andReturn(Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata'));
         
             return $entityManager;
         });
+        
          
 
         $container->set(EntityRepository::class, function(Container $c) {
