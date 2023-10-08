@@ -14,5 +14,3 @@ interface CustomerRepository
     public function remove(Customer $customer): void;
 }
 
-
-//NB: DO NOT forget to create a container for CustomerRepository, inside config/container.php

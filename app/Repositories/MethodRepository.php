@@ -13,6 +13,3 @@ interface MethodRepository
     public function update(Method $method): void;
     public function remove(Method $method): void;
 }
-
-
-//NB: DO NOT forget to create a container for CustomerRepository, inside config/container.php

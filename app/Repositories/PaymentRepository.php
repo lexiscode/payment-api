@@ -14,5 +14,3 @@ interface PaymentRepository
     public function remove(Payment $payment): void;
 }
 
-
-//NB: DO NOT forget to create a container for CustomerRepository, inside config/container.php
