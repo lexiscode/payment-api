@@ -5,6 +5,7 @@ use Monolog\Level;
 use Monolog\Logger;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Monolog\Handler\StreamHandler;
 
 use Monolog\Formatter\JsonFormatter;
@@ -124,11 +125,10 @@ $container->set(MethodRepository::class, function (Container $container){
 });
 
 // Creating a container instance for AuthRepository
-$container->set(AuthRepository::class, function (Container $container){
+$container->set(EntityRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new AuthRepositoryDoctrine($em);
 });
-
 
 
 return $container;

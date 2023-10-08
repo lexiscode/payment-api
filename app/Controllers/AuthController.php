@@ -7,7 +7,7 @@ use Monolog\Logger;
 use App\Model\Auth;
 use Firebase\JWT\JWT;
 use App\Response\CustomResponse;
-use App\Repositories\AuthRepository;
+use Doctrine\ORM\EntityRepository;
 use App\Validation\Validator;
 
 use Psr\Container\ContainerInterface;
@@ -23,7 +23,7 @@ class AuthController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->authRepository = $container->get(AuthRepository::class);
+        $this->authRepository = $container->get(EntityRepository::class);
         $this->logger = $container->get(Logger::class);
     }
 
