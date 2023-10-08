@@ -130,13 +130,5 @@ $container->set(AuthRepository::class, function (Container $container){
 });
 
 
-/* Creating a container instance for AuthRepository
-$container->set(AuthRepository::class, function (Container $container) {
-    $entityManager = $container->get(EntityManager::class);
-    return $entityManager->getRepository(AuthRepositoryDoctrine::class);
-});
-*/
-
-
 
 return $container;
