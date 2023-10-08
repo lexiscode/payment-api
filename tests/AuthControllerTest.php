@@ -9,6 +9,7 @@ use Monolog\Logger;
 use App\Controllers\AuthController;
 use App\Repositories\AuthRepositoryDoctrine;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
 
 use PHPUnit\Framework\TestCase;
 
@@ -19,32 +20,30 @@ class AuthControllerTest extends TestCase
 
     protected function setUp(): void
     {
+        // Create a PHPUnit mock for EntityManager and ClassMetadata
+        $entityManager = $this->getMockBuilder(EntityManagerInterface::class)
+            ->getMock();
+        
+        $classMetadata = $this->getMockBuilder(ClassMetadata::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Set up EntityManager to return the ClassMetadata mock
+        $entityManager->method('getClassMetadata')->willReturn($classMetadata);
+
+        // Create and set up the container
         $container = new Container();
-       
-        $container->set(EntityManager::class, function (Container $c) {
-            $entityManager = Mockery::mock('Doctrine\ORM\EntityManager');
-        
-            // Mock the getClassMetadata method to return a ClassMetadata mock
-            $classMetadataMock = Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-            $entityManager->shouldReceive('getClassMetadata')->andReturn($classMetadataMock);
-        
-            return $entityManager;
+        $container->set(EntityManagerInterface::class, $entityManager);
+        $container->set(EntityRepository::class, function(Container $c) use ($entityManager) {
+            return new AuthRepositoryDoctrine($entityManager);
         });
-        
-        
-         
-
-        $container->set(EntityRepository::class, function(Container $c) {
-            $em = $c->get(EntityManager::class);
-            return new AuthRepositoryDoctrine($em);
-        });
-
         $container->set(Logger::class, function(Container $c) {
             return Mockery::mock('Monolog\Logger');
         });
 
         $this->container = $container;
     }
+
     public function testCreateInstanceOfAuthController()
     {
         $abstractControllerObject = new AuthController($this->container);
