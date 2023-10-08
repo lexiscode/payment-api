@@ -11,3 +11,7 @@ ALERT | 2023-10-07, 21:14:38 > Status 400: Bad Request | {"success":false,"messa
 ALERT | 2023-10-07, 21:21:37 > Status 400: Bad Request | {"success":false,"message":"Request must be of type 'string'.","status":400,"path":"/v1/customers"} []
 ALERT | 2023-10-07, 21:24:48 > Status 400: Bad Request | {"success":false,"message":"Request must be of type 'string'.","status":400,"path":"/v1/customers"} []
 ALERT | 2023-10-07, 21:25:05 > Status 400: Bad Request | {"success":false,"message":"Request must be of type 'string'.","status":400,"path":"/v1/customers"} []
+ALERT | 2023-10-08, 14:30:52 > Internal Server Error | [] []
+ALERT | 2023-10-08, 14:30:52 > Internal Server Error | [] []
+ALERT | 2023-10-08, 14:31:41 > Internal Server Error | [] []
+ALERT | 2023-10-08, 14:32:08 > Internal Server Error | [] []

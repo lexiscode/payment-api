@@ -15,6 +15,8 @@ use App\Repositories\MethodRepository;
 use App\Repositories\MethodRepositoryDoctrine;
 use App\Repositories\PaymentRepository;
 use App\Repositories\PaymentRepositoryDoctrine;
+use App\Repositories\AuthRepository;
+use App\Repositories\AuthRepositoryDoctrine;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -120,6 +122,21 @@ $container->set(MethodRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new MethodRepositoryDoctrine($em);
 });
+
+// Creating a container instance for AuthRepository
+$container->set(AuthRepository::class, function (Container $container){
+    $em = $container->get(EntityManager::class);
+    return new AuthRepositoryDoctrine($em);
+});
+
+
+/* Creating a container instance for AuthRepository
+$container->set(AuthRepository::class, function (Container $container) {
+    $entityManager = $container->get(EntityManager::class);
+    return $entityManager->getRepository(AuthRepositoryDoctrine::class);
+});
+*/
+
 
 
 return $container;

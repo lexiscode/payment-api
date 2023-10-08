@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 
 require __DIR__ . '/../vendor/autoload.php';
+
 require_once __DIR__ . '/../config/container.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/../");
@@ -25,9 +26,21 @@ $app->get('/', function (Request $request, Response $response, array $args) {
     return $response;
 });
 
+// Define a route for Swagger API documentation
+$app->get('/openapi', function (Request $request, Response $response) {
+    // Include the code to generate and return the OpenAPI documentation here
+    require '/openapi/index.php';
+});
 
-// Define routes using controllers
-require "../routes/api.php";
+
+// Include User Authentication Routes
+require __DIR__ . '/../routes/auth.php';
+
+// Includes Project Routes 
+require __DIR__ . "/../routes/api.php";
+
+// Includes JWT Authentication Middleware 
+require __DIR__ . '/../middleware/jwt_proxy.php';
 
 
 // Default slim error message four route that doesn't exists

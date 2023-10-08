@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 
 use Doctrine\ORM\Mapping\Entity;
