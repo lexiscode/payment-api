@@ -112,19 +112,19 @@ $container->set(CustomerRepository::class, function (Container $container){
     return new CustomerRepositoryDoctrine($em);
 });
 
-// Creating a container instance for PaymentRepository
+// Creating a container instance for PaymentRepositoryDoctrine
 $container->set(PaymentRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new PaymentRepositoryDoctrine($em);
 });
 
-// Creating a container instance for MethodRepository
+// Creating a container instance for MethodRepositoryDoctrine 
 $container->set(MethodRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new MethodRepositoryDoctrine($em);
 });
 
-// Creating a container instance for AuthRepository
+// Creating a container instance for AuthRepositoryDoctrine 
 $container->set(EntityRepository::class, function (Container $container){
     $em = $container->get(EntityManager::class);
     return new AuthRepositoryDoctrine($em);
