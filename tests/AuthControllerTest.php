@@ -18,9 +18,16 @@ class AuthControllerTest extends TestCase
     protected function setUp(): void
     {
         $container = new Container();
-        $container->set(EntityManager::class, function(Container $c) {
-            return Mockery::mock('Doctrine\ORM\EntityManager');
+       
+        $container->set(EntityManager::class, function (Container $c) {
+            $entityManager = Mockery::mock('Doctrine\ORM\EntityManager');
+            
+            // Set an expectation for the getClassMetadata method
+            $entityManager->shouldReceive('getClassMetadata')->andReturn(null);
+        
+            return $entityManager;
         });
+         
 
         $container->set(EntityRepository::class, function(Container $c) {
             $em = $c->get(EntityManager::class);
