@@ -8,6 +8,8 @@ use Mockery;
 use Monolog\Logger;
 use App\Controllers\AuthController;
 use App\Repositories\AuthRepositoryDoctrine;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+
 use PHPUnit\Framework\TestCase;
 
 
@@ -23,10 +25,12 @@ class AuthControllerTest extends TestCase
             $entityManager = Mockery::mock('Doctrine\ORM\EntityManager');
         
             // Mock the getClassMetadata method to return a ClassMetadata mock
-            $entityManager->shouldReceive('getClassMetadata')->andReturn(Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata'));
+            $classMetadataMock = Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+            $entityManager->shouldReceive('getClassMetadata')->andReturn($classMetadataMock);
         
             return $entityManager;
         });
+        
         
          
 
