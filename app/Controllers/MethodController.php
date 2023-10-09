@@ -24,7 +24,94 @@ class MethodController
         $this->methodRepository = $container->get(MethodRepository::class);
         $this->logger = $container->get(Logger::class);
     }
-    
+
+    /**
+     * @OA\Put(
+     *     path="/v1/methods/activate/{status}",
+     *     summary="Activate or deactivate methods",
+     *     description="Activate or deactivate all payment methods based on the provided status.",
+     *     operationId="activateMethods",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="path",
+     *         description="Status to activate (1) or deactivate (0) methods",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             enum={0, 1},
+     *             default=1,
+     *         ),
+     *         style="simple",
+     *         explode=false,
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success message",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Activated/Deactivated successfully.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid status value",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Invalid status value. Use 0 for deactivation or 1 for activation.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *         )
+     *     )
+     * )
+     */
+    public function activateMethods(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $status = (int)$args['status'];
+
+            if ($status !== 0 && $status !== 1) {
+                return new JsonResponse(['message' => 'Invalid status value. Use 0 for deactivation or 1 for activation.'], 400);
+            }
+
+            // Update the status of all methods
+            $methods = $this->methodRepository->findAll();
+
+            foreach ($methods as $method) {
+                $method->setIsActive($status);
+                $this->methodRepository->update($method);
+            }
+
+            $message = $status === 1 ? 'Activated successfully.' : 'Deactivated successfully.';
+            return new JsonResponse(['message' => $message], 200);
+        } catch (\Exception $e) {
+            // Handle exceptions and errors here
+            throw new DBException('Internal Server Error', 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/v1/methods",
+     *     summary="Get all methods",
+     *     tags={"Methods"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response containing all methods data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden Route Access",
+     *     )
+     * )
+     */
     public function getAllMethods(Request $request, Response $response): Response
     {
         try{
@@ -33,6 +120,10 @@ class MethodController
 
             $methodData = [];
             foreach ($methods as $method) {
+                // Check if the method is active before including it in the response
+                if (!$method->isActive()) {
+                    return new JsonResponse(['message' => 'This method route is deactivated'], 403);
+                }
                 $methodData[] = $method->toArray();
             }
 
@@ -56,6 +147,37 @@ class MethodController
         
     }
 
+    /**
+     * @OA\Get(
+     *     path="/v1/methods/{id}",
+     *     summary="Get a method data by its ID",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the method data",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response containing the method data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden Route Access",
+     *     )
+     * 
+     * )
+     */
     public function getMethodById(Request $request, Response $response, array $args): Response
     {
         try{
@@ -67,6 +189,10 @@ class MethodController
 
                 $this->logger->info("Status 404: Method not found with this id:$id");
                 return new JsonResponse(['message' => 'Method not found'], 404);
+            }
+
+            if (!$method->isActive()) {
+                return new JsonResponse(['message' => 'This method route is deactivated'], 403);
             }
 
             $methodData = $method->toArray();
@@ -81,6 +207,35 @@ class MethodController
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/v1/methods",
+     *     summary="Create a new method",
+     *     tags={"Methods"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="name", type="string", example="Customer Name")
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with method creation status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function createMethod(Request $request, Response $response): Response
     {
         try {
@@ -120,7 +275,46 @@ class MethodController
         }
     }
 
-
+    /**
+     * @OA\Put(
+     *     path="/v1/methods/{id}",
+     *     summary="Update all data of a specific method by its ID",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Method ID",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="name", type="string", example="Updated Method Name"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with method update status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found with this ID",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function putMethod(Request $request, Response $response, array $args): Response
     {
         try {
@@ -188,6 +382,46 @@ class MethodController
         }
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/methods/{id}",
+     *     summary="Update all or a part of a specific method by its ID",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Method ID",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="name", type="string", example="Updated Method Name"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with method update status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Method not found with this ID",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function patchMethod(Request $request, Response $response, array $args): Response
     {
         try {
@@ -271,6 +505,36 @@ class MethodController
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/v1/methods/{id}",
+     *     summary="Delete a specific method by its ID",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the method to be deleted",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with delete status",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Resource not found",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function deleteMethod(Request $request, Response $response, array $args): Response
     {
         try {
@@ -291,6 +555,19 @@ class MethodController
 
                     $this->logger->info("Status 404: Method not found with this id:$id", $errorResponse);
                     return new JsonResponse($errorResponse, 404);
+                }
+
+                // Check if the method is deactivated
+                if (!$method->isActive()) {
+                    $errorResponse = [
+                        "success" => false,
+                        "message" => "Cannot delete a deactivated method",
+                        "status" => 403,
+                        "path" => "/v1/methods/$id"
+                    ];
+
+                    $this->logger->info("Status 403: Cannot delete a deactivated method", $errorResponse);
+                    return new JsonResponse($errorResponse, 403);
                 }
 
                 $methodRepository->remove($method);

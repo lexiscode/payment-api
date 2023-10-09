@@ -25,6 +25,25 @@ class PaymentController
         $this->logger = $container->get(Logger::class);
     }
     
+    /**
+     * @OA\Get(
+     *     path="/v1/payments",
+     *     summary="Get all payments",
+     *     tags={"Payments"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response containing all payments data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden Route Access",
+     *     )
+     * )
+     */
     public function getAllPayments(Request $request, Response $response): Response
     {
         try{
@@ -56,6 +75,37 @@ class PaymentController
         
     }
 
+     /**
+     * @OA\Get(
+     *     path="/v1/payments/{id}",
+     *     summary="Get a payment data by its ID",
+     *     tags={"Payments"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the payment data",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response containing the method data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden Route Access",
+     *     )
+     * 
+     * )
+     */
     public function getPaymentById(Request $request, Response $response, array $args): Response
     {
         try{
@@ -81,6 +131,35 @@ class PaymentController
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/v1/payments",
+     *     summary="Create a new payment",
+     *     tags={"Payments"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="sum", type="float", example="Payment Sum")
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with payment creation status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function createPayment(Request $request, Response $response): Response
     {
         try {
@@ -119,7 +198,46 @@ class PaymentController
         }
     }
 
-
+    /**
+     * @OA\Put(
+     *     path="/v1/payments/{id}",
+     *     summary="Update all data of a specific payment by its ID",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Payment ID",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="sum", type="float", example="Updated Payment Sum"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with payment update status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found with this ID",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function putPayment(Request $request, Response $response, array $args): Response
     {
         try {
@@ -199,6 +317,46 @@ class PaymentController
         }
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/payments/{id}",
+     *     summary="Update all or a part of a specific method by its ID",
+     *     tags={"Payments"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Payment ID",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="sum", type="float", example="Updated Payment Sum"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with payment update status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Payment not found with this ID",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function patchPayment(Request $request, Response $response, array $args): Response
     {
         try {
@@ -282,6 +440,36 @@ class PaymentController
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/v1/payments/{id}",
+     *     summary="Delete a specific payment by its ID",
+     *     tags={"Methods"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the payment to be deleted",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with delete status",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Resource not found",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function deletePayment(Request $request, Response $response, array $args): Response
     {
         try {

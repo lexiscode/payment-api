@@ -22,6 +22,9 @@ class Customer
     #[Column(type: 'text')]
     private $address;
 
+    #[Column(name: 'is_active', type: 'boolean', nullable: false)]
+    private bool $is_active = true;
+
 
     public function getId(): ?int
     {
@@ -49,6 +52,17 @@ class Customer
     {
         $this->address = $address;
 
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
+    public function setIsActive(bool $is_active): self
+    {
+        $this->is_active = $is_active;
         return $this;
     }
 

@@ -31,3 +31,5 @@
 {"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-08T21:22:57.240847+00:00","extra":{}}
 {"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-08T21:24:15.792655+00:00","extra":{}}
 {"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-08T21:24:40.139902+00:00","extra":{}}
+{"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-09T11:48:33.409750+00:00","extra":{}}
+{"message":"Not found.","context":{},"level":500,"level_name":"CRITICAL","channel":"payment-api","datetime":"2023-10-09T12:42:05.210844+00:00","extra":{}}

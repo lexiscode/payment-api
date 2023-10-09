@@ -19,6 +19,9 @@ class Method
     #[Column(type: 'string', unique: true, nullable: false, length: 255)]
     private $name;
 
+    #[Column(name: 'is_active', type: 'boolean', nullable: false)]
+    private bool $is_active = true;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,13 +39,18 @@ class Method
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
 
-    /**
-     * Doctrine entities are often designed to be serialized in a specific way, and by default, 
-     * some properties may not be accessible for serialization.
-     * 
-     * Therefore, this method returns an array representation of the entity's data.
-     */
+    public function setIsActive(bool $is_active): self
+    {
+        $this->is_active = $is_active;
+        return $this;
+    }
+
+
     public function toArray(): array
     {
         return [

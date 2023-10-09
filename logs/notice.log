@@ -31,3 +31,5 @@
 [2023-10-08T21:22:57.240847+00:00] payment-api.ALERT: Internal Server Error [] []
 [2023-10-08T21:24:15.792655+00:00] payment-api.ALERT: Internal Server Error [] []
 [2023-10-08T21:24:40.139902+00:00] payment-api.ALERT: Internal Server Error [] []
+[2023-10-09T11:48:33.409750+00:00] payment-api.ALERT: Internal Server Error [] []
+[2023-10-09T12:42:05.210844+00:00] payment-api.CRITICAL: Not found. [] []

@@ -14,8 +14,8 @@ $app->group('/v1/customers', function ($group) {
     $group->patch('/{id:\d+}', [CustomerController::class, 'patchCustomer']);
     $group->delete('/{id}', [CustomerController::class, 'deleteCustomer']);
 
-    $group->get('/deactivate/{id:\d+}', [CustomerController::class, 'getDeactivatedCustomer']);
-    $group->get('/reactivate/{id}', [CustomerController::class, 'getReactivatedCustomer']);
+    // New route for activation/deactivation
+    $group->put('/activate/{status}', [CustomerController::class, 'activateCustomers']);
 });
 
 
@@ -28,8 +28,8 @@ $app->group('/v1/methods', function ($group) {
     $group->patch('/{id:\d+}', [MethodController::class, 'patchMethod']);
     $group->delete('/{id}', [MethodController::class, 'deleteMethod']);
 
-    $group->get('/deactivate/{id:\d+}', [MethodController::class, 'getDeactivatedMethod']);
-    $group->get('/reactivate/{id}', [MethodController::class, 'getReactivatedMethod']);
+    // New route for activation/deactivation
+    $group->put('/activate/{status}', [MethodController::class, 'activateMethods']);
 });
 
 

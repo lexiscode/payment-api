@@ -15,6 +15,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Respect\Validation\Validator as v;
 
+use OpenApi\Annotations as OA;
 
 class AuthController
 {
@@ -27,6 +28,40 @@ class AuthController
         $this->logger = $container->get(Logger::class);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/login",
+     *     summary="Authenticate a user by email and password",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="password", type="string", example="user_password"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with authentication status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized due to invalid credentials",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function authLogin(Request $request, Response $response): Response
     {
         // Get the JSON content from the request body
@@ -108,6 +143,36 @@ class AuthController
         return $customResponse->respondWithData($response, $successResponse, 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/register",
+     *     summary="Register a new user with email and password",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="email", type="string", example="new_user@example.com"),
+     *                 @OA\Property(property="password", type="string", example="new_user_password"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with user registration status",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function authRegister(Request $request, Response $response): Response
     {
         // Get the JSON content from the request body

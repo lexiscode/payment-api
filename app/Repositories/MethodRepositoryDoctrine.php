@@ -66,4 +66,5 @@ class MethodRepositoryDoctrine implements MethodRepository
         return $this->entityManager->getRepository(Method::class)->find($id);
        
     }
+
 }
