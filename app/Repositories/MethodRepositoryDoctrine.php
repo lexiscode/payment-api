@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Model\Method;
 use Doctrine\ORM\EntityManager;
-use App\Repositories\CustomerRepository;
+use App\Repositories\MethodRepository;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
