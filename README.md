@@ -5,6 +5,7 @@ The Payment-API is a RESTful API designed to handle requests related to customer
 </p>
 
 [![Continuous Integration PaymentAPI](https://github.com/lexiscode/payment-api/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/lexiscode/payment-api/actions/workflows/continuous-integration.yml)
+[![Build]](https://img.shields.io/github/actions/workflow/status/lexiscode/payment-api/continuous-integration.yml)
 
 ## Installation
 
