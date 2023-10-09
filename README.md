@@ -56,5 +56,5 @@ Note: If you are using only the Docker containers, remember to include the prefi
   ```
 
 ## Heroku Deployment
-![Heroku Deploy](https://lexispayment-api-c0593ff58537.herokuapp.com/)
+Deployment URL: (https://lexispayment-api-c0593ff58537.herokuapp.com/)
 
