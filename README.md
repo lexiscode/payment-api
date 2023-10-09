@@ -36,11 +36,78 @@ This app can run using the typical XAMPP configuration; ensure you have the corr
    ````
    docker-compose up --build
    ````
-3. Create the tables.
+3. To ensure that MariaDB has started running fully, you may need wait for approx. 2-3 mins, or you can check by using this commands below:
    ```
-   docker exec -it [fpm-container-id] php vendor/bin/doctrine orm:schema-tool:create 
+   >> docker exec -it [mariadb-container-id] bash
+   >> mariadb -u root -p 
+   >> password is also "root"
    ````
-4. Go to http://localhost:8000
+4. Create the tables.
+   ```
+   >> docker exec -it [fpm-container-id] bash
+   >> php vendor/bin/doctrine orm:schema-tool:create 
+   ````
+5. Go to http://localhost:8000
+
+## All Routes
+
+The API can be tested using Postman. But note that you will need to first create a JWT authentication token (by creating an account) in order to gain access to the payment API resources. Once you've registered, then logged in, and a JWT Bearer Token will be given to you.
+
+Use the following endpoint to create a user account and also login in order to generate an authorization "Bearer Token":
+```
+POST /register
+POST /login
+```
+Sample JSON request body for both the registeration and login, only email and password fields:
+```
+{
+  "email": "email@example.com",
+  "password": "password",
+}
+```
+NB: You have to remain in this one particular tab to test all requests, the token grants access to only a single Postman tab, so don't open multiple tabs.
+
+
+For Customers Routes:
+````
+GET: /v1/customers/activate/{status}
+GET: /v1/customers
+GET: /v1/customers/{id}
+POST: /v1/customers
+PUT: /v1/customers/{id}
+PATCH: /v1/customers/{id}
+DELETE: /v1/customers/{id}
+````
+
+Note: The {status} can only hold a boolean value, 1 (activate) or 0 (deactivate).
+
+For Methods Routes:
+````
+GET: /v1/methods/activate/{status}
+GET: /v1/methods
+GET: /v1/methods/{id}
+POST: /v1/methods
+PUT: /v1/methods/{id}
+PATCH: /v1/methods/{id}
+DELETE: /v1/methods/{id}
+````
+
+Note: The {status} can only hold a boolean value, 1 (activate) or 0 (deactivate).
+
+For Payments Routes:
+````
+GET: /v1/payments
+GET: /v1/payments/{id}
+POST: /v1/payments
+PUT: /v1/payments/{id}
+PATCH: /v1/payments/{id}
+DELETE: /v1/payments/{id}
+````
+
+## API Testing with Swagger 
+The API can be tested using Swagger UI also. Run a local server inside your public directory, using port 200. Then visit this URL: http://localhost:200/docs/
+
+NB: For now to gain access to the resources and to bypass authentication in Swagger, first go inside my public/index.php file and "comment" code line 43 (i.e. where I wrote this: require DIR . '/../middleware/jwt_proxy.php';). In this note, for now, don't bother testing the Authentication section (i.e. the register and login sections) in the Swagger UI, focus on other routes.
 
 ## Quality Tools
 
