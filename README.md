@@ -1,12 +1,10 @@
 <h1 align="center">Payment API</h1>
 
 <p align="center">
-This is a Payment-API final project created for the Jagaad Academy PHP Course module 5 
 The Payment-API is a RESTful API designed to handle requests related to customers, methods and payments. This application programming interface is created using a secured OAuth JWT, while working with Doctrine ORM, OOP, MVC, Slim Microframework, GitHub Action continuous integration with PHPStan and PHPUnit, MySQL as the database and used Postman for API testing and Swagger for API documentation.
 </p>
 
 [![Continuous Integration PaymentAPI](https://github.com/lexiscode/payment-api/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/lexiscode/payment-api/actions/workflows/continuous-integration.yml)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lexiscode/payment-api/continuous-integration.yml)
 
 ## Installation
 
