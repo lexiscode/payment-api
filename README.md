@@ -15,7 +15,7 @@ This app can run using the typical XAMPP configuration; ensure you have the corr
 ### Here's how we run it using XAMPP:
 
 1. Ensure you have XAMPP and Composer installed.
-2. Create the database `payment_api`.
+2. Create the database `payment_api` and set Privileges.
 3. Install the PHP dependencies.
    ````
    composer install

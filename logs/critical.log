@@ -34,3 +34,5 @@
 {"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-09T11:48:33.409750+00:00","extra":{}}
 {"message":"Not found.","context":{},"level":500,"level_name":"CRITICAL","channel":"payment-api","datetime":"2023-10-09T12:42:05.210844+00:00","extra":{}}
 {"message":"Status 400: Bad Request","context":{"success":false,"message":"Request must be either a float or an integer only.","status":400,"path":"/v1/payments"},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-09T23:08:41.740975+00:00","extra":{}}
+{"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-10T02:21:20.240750+02:00","extra":{}}
+{"message":"Internal Server Error","context":{},"level":550,"level_name":"ALERT","channel":"payment-api","datetime":"2023-10-10T02:21:44.365133+02:00","extra":{}}

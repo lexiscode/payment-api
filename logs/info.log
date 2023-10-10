@@ -56,3 +56,5 @@
 [2023-10-09T23:56:50.803193+00:00] payment-api.INFO: Status 400: Failed validation (Bad request). [] []
 [2023-10-09T23:57:14.632234+00:00] payment-api.INFO: Status 400: Failed validation (Bad request). [] []
 [2023-10-10T00:01:57.898212+00:00] payment-api.INFO: Status 400: Failed validation (Bad request). [] []
+[2023-10-10T02:21:20.240750+02:00] payment-api.ALERT: Internal Server Error [] []
+[2023-10-10T02:21:44.365133+02:00] payment-api.ALERT: Internal Server Error [] []

@@ -211,7 +211,7 @@ class PaymentController
      * @OA\Put(
      *     path="/v1/payments/{id}",
      *     summary="Update all data of a specific payment by its ID",
-     *     tags={"Methods"},
+     *     tags={"Payments"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -455,7 +455,7 @@ class PaymentController
      * @OA\Delete(
      *     path="/v1/payments/{id}",
      *     summary="Delete a specific payment by its ID",
-     *     tags={"Methods"},
+     *     tags={"Payments"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
