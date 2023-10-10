@@ -38,13 +38,14 @@ This app can run using the typical XAMPP configuration; ensure you have the corr
    ````
 3. To ensure that MariaDB has started running fully, you may need wait for approx. 2-3 mins, or you can check by using this commands below:
    ```
-   >> docker exec -it [mariadb-container-id] bash
+   >> docker exec -it payment_api_mariadb bash
    >> mariadb -u root -p 
    >> password is also "root"
    ````
+NB: If you get an error like this (ERROR 2002 (HY000) or ERROR 1045 (28000)) after inputting the login details above, it means you should wait more like a minute extra for MariaDB to fully start, then try again.
 4. Create the tables.
    ```
-   >> docker exec -it [fpm-container-id] bash
+   >> docker exec -it payment_api_php bash
    >> php vendor/bin/doctrine orm:schema-tool:create 
    ````
 5. Go to http://localhost:8000
@@ -65,7 +66,7 @@ Sample JSON request body for both the registeration and login, only email and pa
   "password": "password",
 }
 ```
-NB: You have to remain in this one particular tab to test all requests, the token grants access to only a single Postman tab, so don't open multiple tabs.
+NB: You have to remain in a particular tab where you've set the JWT token to test all requests, the token grants access to only a single Postman tab, so don't open multiple tabs. Except the token is set globally in the application. You have limited timeframe access to resources for 2 hours only.
 
 
 For Customers Routes:

@@ -115,8 +115,15 @@ class PaymentController
 
             if ($payment === null) {
 
+                $responseData = [
+                    "success" => false,
+                    "message" => "Payment data not found",
+                    "status" => 404,
+                    "path" => "/v1/payments/$id"
+                ];
+
                 $this->logger->info("Status 404: Payment not found with this id:$id");
-                return new JsonResponse(['message' => 'Payment not found'], 404);
+                return new JsonResponse($responseData, 404);
             }
 
             $paymentData = $payment->toArray();
@@ -178,8 +185,10 @@ class PaymentController
                 return new JsonResponse($responseData, 400);
             }
 
+            $paymentRequestBody = filter_var($paymentInfo['sum'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);;
+            
             $payment = new Payment();
-            $payment->setSum($paymentInfo['sum']);
+            $payment->setSum($paymentRequestBody);
 
             $paymentRepository = $this->paymentRepository;
             $paymentRepository->store($payment);
@@ -287,7 +296,8 @@ class PaymentController
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $payment->setSum($paymentInfo['sum']);
+                $paymentRequestBody = filter_var($paymentInfo['sum'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                $payment->setSum($paymentRequestBody);
 
                 $paymentRepository->update($payment);
 
@@ -409,7 +419,8 @@ class PaymentController
                         return new JsonResponse($errorResponse, 400);
                     }
 
-                    $payment->setSum($paymentInfo['sum']);
+                    $paymentRequestBody = filter_var($paymentInfo['sum'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);;
+                    $payment->setSum($paymentRequestBody);
                 }
 
                 $paymentRepository->update($payment);

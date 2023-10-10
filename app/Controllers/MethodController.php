@@ -9,6 +9,9 @@ use App\Exception\DBException;
 use Psr\Container\ContainerInterface;
 use App\Repositories\MethodRepository;
 use Slim\Exception\HttpNotFoundException;
+use App\Validation\Validator;
+use Respect\Validation\Validator as v;
+use App\Response\CustomResponse;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -187,8 +190,15 @@ class MethodController
 
             if ($method === null) {
 
+                $responseData = [
+                    "success" => false,
+                    "message" => "Method data not found",
+                    "status" => 404,
+                    "path" => "/v1/methods/$id"
+                ];
+
                 $this->logger->info("Status 404: Method not found with this id:$id");
-                return new JsonResponse(['message' => 'Method not found'], 404);
+                return new JsonResponse($responseData, 404);
             }
 
             if (!$method->isActive()) {
@@ -254,8 +264,27 @@ class MethodController
                 return new JsonResponse($responseData, 400);
             }
 
+            $methodNameRequestBody = htmlspecialchars($methodInfo['name']);
+
+            // Instantiate Validator and CustomResponse classes
+            $validator = new Validator();
+            $customResponse = new CustomResponse();
+
+            // Validate input data using the $validator
+            $validator->validate($request, [
+                "name" => v::notEmpty()
+            ]);
+
+            // If validation fails, return a 400 error response
+            if ($validator->failed()) {
+                $responseMessage = $validator->errors;
+
+                $this->logger->info('Status 400: Failed validation (Bad request).');
+                return $customResponse->is400Response($response, $responseMessage);
+            }
+
             $method = new Method();
-            $method->setName($methodInfo['name']);
+            $method->setName($methodNameRequestBody);
 
             $methodRepository = $this->methodRepository;
             $methodRepository->store($method);
@@ -352,7 +381,26 @@ class MethodController
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $method->setName($methodInfo['name']);
+                $methodNameRequestBody = htmlspecialchars($methodInfo['name']);
+
+                // Instantiate Validator and CustomResponse classes
+                $validator = new Validator();
+                $customResponse = new CustomResponse();
+
+                // Validate input data using the $validator
+                $validator->validate($request, [
+                    "name" => v::notEmpty()
+                ]);
+
+                // If validation fails, return a 400 error response
+                if ($validator->failed()) {
+                    $responseMessage = $validator->errors;
+
+                    $this->logger->info('Status 400: Failed validation (Bad request).');
+                    return $customResponse->is400Response($response, $responseMessage);
+                }
+
+                $method->setName($methodNameRequestBody);
 
                 $methodRepository->update($method);
 
@@ -474,7 +522,26 @@ class MethodController
                         return new JsonResponse($errorResponse, 400);
                     }
 
-                    $method->setName($methodInfo['name']);
+                    $methodNameRequestBody = htmlspecialchars($methodInfo['name']);
+
+                    // Instantiate Validator and CustomResponse classes
+                    $validator = new Validator();
+                    $customResponse = new CustomResponse();
+
+                    // Validate input data using the $validator
+                    $validator->validate($request, [
+                        "name" => v::notEmpty()
+                    ]);
+
+                    // If validation fails, return a 400 error response
+                    if ($validator->failed()) {
+                        $responseMessage = $validator->errors;
+
+                        $this->logger->info('Status 400: Failed validation (Bad request).');
+                        return $customResponse->is400Response($response, $responseMessage);
+                    }
+
+                    $method->setName($methodNameRequestBody);
                 }
 
                 $methodRepository->update($method);

@@ -33,3 +33,4 @@
 [2023-10-08T21:24:40.139902+00:00] payment-api.ALERT: Internal Server Error [] []
 [2023-10-09T11:48:33.409750+00:00] payment-api.ALERT: Internal Server Error [] []
 [2023-10-09T12:42:05.210844+00:00] payment-api.CRITICAL: Not found. [] []
+[2023-10-09T23:08:41.740975+00:00] payment-api.ALERT: Status 400: Bad Request {"success":false,"message":"Request must be either a float or an integer only.","status":400,"path":"/v1/payments"} []

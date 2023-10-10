@@ -16,10 +16,10 @@ class Customer
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    #[Column(type: 'string', length: 255)]
+    #[Column(type: 'string', length: 255, nullable: false)]
     private $name;
 
-    #[Column(type: 'text')]
+    #[Column(type: 'text', nullable: false)]
     private $address;
 
     #[Column(name: 'is_active', type: 'boolean', nullable: false)]

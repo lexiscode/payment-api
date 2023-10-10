@@ -5,10 +5,13 @@ namespace App\Controllers;
 use Slim\App;
 use Monolog\Logger;
 use App\Model\Customer;
+use App\Response\CustomResponse;
 use App\Exception\DBException;
 use Psr\Container\ContainerInterface;
 use App\Repositories\CustomerRepository;
 use Slim\Exception\HttpNotFoundException;
+use App\Validation\Validator;
+use Respect\Validation\Validator as v;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -88,7 +91,6 @@ class CustomerController
             $message = $status === 1 ? 'Activated successfully.' : 'Deactivated successfully.';
             return new JsonResponse(['message' => $message], 200);
         } catch (\Exception $e) {
-            // Handle exceptions and errors here
             throw new DBException('Internal Server Error', 500);
         }
     }
@@ -187,8 +189,15 @@ class CustomerController
 
             if ($customer === null) {
 
+                $responseData = [
+                    "success" => false,
+                    "message" => "Customer data not found",
+                    "status" => 404,
+                    "path" => "/v1/customers/$id"
+                ];
+
                 $this->logger->info("Status 404: Customer not found with this id:$id");
-                return new JsonResponse(['message' => 'Customer not found'], 404);
+                return new JsonResponse($responseData, 404);
             }
 
             if (!$customer->isActive()) {
@@ -255,9 +264,30 @@ class CustomerController
                 return new JsonResponse($responseData, 400);
             }
 
+            $customerNameRequestBody = htmlspecialchars($customerInfo['name']);
+            $customerAddressRequestBody = htmlspecialchars($customerInfo['address']);
+
+            // Instantiate Validator and CustomResponse classes
+            $validator = new Validator();
+            $customResponse = new CustomResponse();
+
+            // Validate input data using the $validator
+            $validator->validate($request, [
+                "name" => v::notEmpty(),
+                "address" => v::notEmpty()
+            ]);
+
+            // If validation fails, return a 400 error response
+            if ($validator->failed()) {
+                $responseMessage = $validator->errors;
+
+                $this->logger->info('Status 400: Failed validation (Bad request).');
+                return $customResponse->is400Response($response, $responseMessage);
+            }
+
             $customer = new Customer();
-            $customer->setName($customerInfo['name']);
-            $customer->setAddress($customerInfo['address']);
+            $customer->setName($customerNameRequestBody);
+            $customer->setAddress($customerAddressRequestBody);
 
             $customerRepository = $this->customerRepository;
             $customerRepository->store($customer);
@@ -355,8 +385,29 @@ class CustomerController
                     return new JsonResponse($errorResponse, 404);
                 }
 
-                $customer->setName($customerInfo['name']);
-                $customer->setAddress($customerInfo['address']);
+                $customerNameRequestBody = htmlspecialchars($customerInfo['name']);
+                $customerAddressRequestBody = htmlspecialchars($customerInfo['address']);
+
+                // Instantiate Validator and CustomResponse classes
+                $validator = new Validator();
+                $customResponse = new CustomResponse();
+
+                // Validate input data using the $validator
+                $validator->validate($request, [
+                    "name" => v::notEmpty(),
+                    "address" => v::notEmpty()
+                ]);
+
+                // If validation fails, return a 400 error response
+                if ($validator->failed()) {
+                    $responseMessage = $validator->errors;
+
+                    $this->logger->info('Status 400: Failed validation (Bad request).');
+                    return $customResponse->is400Response($response, $responseMessage);
+                }
+
+                $customer->setName($customerNameRequestBody);
+                $customer->setAddress($customerAddressRequestBody);
 
                 $customerRepository->update($customer);
 
@@ -479,7 +530,26 @@ class CustomerController
                         return new JsonResponse($errorResponse, 400);
                     }
 
-                    $customer->setName($customerInfo['name']);
+                    $customerNameRequestBody = htmlspecialchars($customerInfo['name']);
+
+                    // Instantiate Validator and CustomResponse classes
+                    $validator = new Validator();
+                    $customResponse = new CustomResponse();
+
+                    // Validate input data using the $validator
+                    $validator->validate($request, [
+                        "name" => v::notEmpty()
+                    ]);
+
+                    // If validation fails, return a 400 error response
+                    if ($validator->failed()) {
+                        $responseMessage = $validator->errors;
+
+                        $this->logger->info('Status 400: Failed validation (Bad request).');
+                        return $customResponse->is400Response($response, $responseMessage);
+                    }
+
+                    $customer->setName($customerNameRequestBody);
                 }
 
                 if (isset($customerInfo['address'])) {
@@ -496,7 +566,26 @@ class CustomerController
                         return new JsonResponse($errorResponse, 400);
                     }
 
-                    $customer->setAddress($customerInfo['address']);
+                    $customerAddressRequestBody = htmlspecialchars($customerInfo['address']);
+
+                    // Instantiate Validator and CustomResponse classes
+                    $validator = new Validator();
+                    $customResponse = new CustomResponse();
+
+                    // Validate input data using the $validator
+                    $validator->validate($request, [
+                        "address" => v::notEmpty()
+                    ]);
+
+                    // If validation fails, return a 400 error response
+                    if ($validator->failed()) {
+                        $responseMessage = $validator->errors;
+
+                        $this->logger->info('Status 400: Failed validation (Bad request).');
+                        return $customResponse->is400Response($response, $responseMessage);
+                    }
+
+                    $customer->setAddress($customerAddressRequestBody);
                 }
 
                 $customerRepository->update($customer);
