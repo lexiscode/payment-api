@@ -15,18 +15,26 @@ This app can run using the typical XAMPP configuration; ensure you have the corr
 ### Here's how we run it using XAMPP:
 
 1. Ensure you have XAMPP and Composer installed.
-2. Create the database `payment_api` and set Privileges.
+2. Create the database `payment_api`.
 3. Install the PHP dependencies.
    ````
    composer install
    ````
-4. Create the tables.
+4. Update your .env file configuration
+   ````
+   MARIADB_HOST=localhost
+   MARIADB_ROOT_PASSWORD=root
+   MARIADB_DB_NAME=payment_api
+   MARIADB_DB_USER=root
+   MARIADB_DB_USER_PASSWORD=
+   ````
+5. Create the tables.
    ```
    php vendor/bin/doctrine orm:schema-tool:create 
    ````
-5. Run the local web server.
+6. Run the local web server.
    ```
-   php -S localhost:8000 -t public/
+   php -S localhost:200 -t public/
    ````
 
 ### Here's with Docker:
@@ -106,7 +114,7 @@ DELETE: /v1/payments/{id}
 ````
 
 ## API Testing with Swagger 
-The API can be tested using Swagger UI also. Run a local server inside your public directory, using port 200. Then visit this URL: http://localhost:200/docs/
+For this case, ensure you've setup the project to work with your local XAMPP as detailed at the top of this README. Then run a local server inside your /public directory, using port 200. Then visit this URL: http://localhost:200/docs/
 
 NB: For now to gain access to the resources and to bypass authentication in Swagger, first go inside my public/index.php file and "comment" code line 43 (i.e. where I wrote this: require DIR . '/../middleware/jwt_proxy.php';). In this note, for now, don't bother testing the Authentication section (i.e. the register and login sections) in the Swagger UI, focus on other routes.
 

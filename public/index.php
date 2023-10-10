@@ -29,7 +29,7 @@ $app->get('/', function (Request $request, Response $response, array $args) {
 // Define a route for Swagger API documentation
 $app->get('/openapi', function (Request $request, Response $response) {
     // Include the code to generate and return the OpenAPI documentation here
-    require '/openapi/index.php';
+    require __DIR__ . '/openapi/index.php';
 });
 
 

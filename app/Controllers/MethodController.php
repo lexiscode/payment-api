@@ -432,7 +432,7 @@ class MethodController
 
     /**
      * @OA\Patch(
-     *     path="/methods/{id}",
+     *     path="/v1/methods/{id}",
      *     summary="Update all or a part of a specific method by its ID",
      *     tags={"Methods"},
      *     @OA\Parameter(

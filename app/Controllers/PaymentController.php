@@ -149,7 +149,7 @@ class PaymentController
      *             mediaType="application/json",
      *             @OA\Schema(
      *                 type="object",
-     *                 @OA\Property(property="sum", type="float", example="Payment Sum")
+     *                 @OA\Property(property="sum", type="float", example=200.55)
      *             ),
      *         ),
      *     ),
@@ -160,6 +160,10 @@ class PaymentController
      *     @OA\Response(
      *         response=400,
      *         description="Bad request or invalid JSON data",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
      *     ),
      *     @OA\Response(
      *         response=500,
@@ -183,6 +187,18 @@ class PaymentController
 
                 $this->logger->info('Status 400: Invalid JSON data (Bad request).', $responseData);
                 return new JsonResponse($responseData, 400);
+            }
+
+            if (!is_float($paymentInfo['sum']) && !is_integer($paymentInfo['sum'])){
+                $errorResponse = [
+                    "success" => false,
+                    "message" => "Request must be either a float or an integer only.",
+                    "status" => 400,
+                    "path" => "/v1/payments"
+                ];
+
+                $this->logger->alert("Status 400: Bad Request", $errorResponse);
+                return new JsonResponse($errorResponse, 404);
             }
 
             $paymentRequestBody = filter_var($paymentInfo['sum'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);;
@@ -329,7 +345,7 @@ class PaymentController
 
     /**
      * @OA\Patch(
-     *     path="/payments/{id}",
+     *     path="/v1/payments/{id}",
      *     summary="Update all or a part of a specific method by its ID",
      *     tags={"Payments"},
      *     @OA\Parameter(

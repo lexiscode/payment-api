@@ -439,7 +439,7 @@ class CustomerController
 
     /**
      * @OA\Patch(
-     *     path="/customers/{id}",
+     *     path="/v1/customers/{id}",
      *     summary="Update all or a part of a specific customer by its ID",
      *     tags={"Customers"},
      *     @OA\Parameter(
