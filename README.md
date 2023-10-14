@@ -79,7 +79,7 @@ NB: You have to remain in a particular tab where you've set the JWT token to tes
 
 For Customers Routes:
 ````
-GET: /v1/customers/activate/{status}
+PUT: /v1/customers/activate/{status}
 GET: /v1/customers
 GET: /v1/customers/{id}
 POST: /v1/customers
@@ -92,7 +92,7 @@ Note: The {status} can only hold a boolean value, 1 (activate) or 0 (deactivate)
 
 For Methods Routes:
 ````
-GET: /v1/methods/activate/{status}
+PUT: /v1/methods/activate/{status}
 GET: /v1/methods
 GET: /v1/methods/{id}
 POST: /v1/methods
