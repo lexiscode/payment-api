@@ -1,5 +1,5 @@
 {
-    "name": "nwoko/slim-docker-api",
+    "name": "nwoko/payment-api",
     "type": "project",
     "autoload": {
         "psr-4": {
